@@ -1,0 +1,16 @@
+# HCP Project
+project_id = "<your-hcp-project-id>"
+
+# Basic Configuration
+hvn_id       = "vault-training-hvn"
+cluster_id   = "vault-training-cluster"
+region       = "us-west-2"
+vault_tier   = "dev"  # Options: dev, starter_small, standard_small, standard_medium, standard_large, plus_small, plus_medium, plus_large
+
+# Network Configuration
+hvn_cidr_block  = "172.25.16.0/20"
+public_endpoint = true
+
+# Cloud Provider (aws or azure)
+cloud_provider = "aws"
+

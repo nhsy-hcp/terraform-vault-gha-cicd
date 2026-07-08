@@ -1,0 +1,65 @@
+version: "3"
+
+vars:
+  BOOTSTRAP_DIR: bootstrap
+
+tasks:
+  # ---------------------------------------------------------------------------
+  # Top-level tasks
+  # ---------------------------------------------------------------------------
+
+  lint:
+    desc: Run all code quality and formatting checks
+    cmd: pre-commit run -a
+
+  # ---------------------------------------------------------------------------
+  # bootstrap namespace
+  # ---------------------------------------------------------------------------
+
+  bootstrap:init:
+    desc: Initialise Terraform providers and modules for the bootstrap module
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform init -upgrade
+
+  bootstrap:validate:
+    desc: Validate the bootstrap Terraform configuration
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform validate
+
+  bootstrap:fmt:
+    desc: Format the bootstrap Terraform files
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform fmt -recursive
+
+  bootstrap:plan:
+    desc: Generate and display a Terraform execution plan for bootstrap
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform plan
+
+  bootstrap:apply:
+    desc: Apply the bootstrap infrastructure (prompts for confirmation)
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform apply
+
+  bootstrap:destroy:
+    desc: Destroy all bootstrap-managed infrastructure (prompts for confirmation)
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform destroy
+
+  bootstrap:output:
+    desc: Display all outputs from the bootstrap state
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform output
+
+  bootstrap:clean:
+    desc: Remove local Terraform cache for bootstrap
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - rm -rf .terraform .terraform.lock.hcl

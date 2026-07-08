@@ -1,0 +1,39 @@
+terraform {
+  required_providers {
+    hcp = {
+      source  = "hashicorp/hcp"
+      version = "~> 0.112"
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.9"
+    }
+  }
+  required_version = ">= 1.9, < 2.0"
+}
+
+provider "hcp" {
+  project_id = var.project_id
+}
+
+resource "random_pet" "default" {
+  length = 1
+}
+
+resource "hcp_hvn" "vault_hvn" {
+  hvn_id         = var.hvn_id
+  cloud_provider = var.cloud_provider
+  region         = var.region
+  cidr_block     = var.hvn_cidr_block
+}
+
+resource "hcp_vault_cluster" "vault_cluster" {
+  cluster_id      = "${var.cluster_id}-${random_pet.default.id}"
+  hvn_id          = hcp_hvn.vault_hvn.hvn_id
+  tier            = var.vault_tier
+  public_endpoint = var.public_endpoint
+}
+
+resource "hcp_vault_cluster_admin_token" "admin_token" {
+  cluster_id = hcp_vault_cluster.vault_cluster.cluster_id
+}
