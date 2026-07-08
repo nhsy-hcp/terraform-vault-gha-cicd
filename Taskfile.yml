@@ -16,6 +16,7 @@ tasks:
     desc: Check required dependencies are installed
     cmds:
       - command -v terraform >/dev/null 2>&1 || (echo "terraform not found" && exit 1)
+      - command -v vault >/dev/null 2>&1 || (echo "vault not found" && exit 1)
       - command -v hcp >/dev/null 2>&1 || (echo "hcp not found" && exit 1)
       - command -v pre-commit >/dev/null 2>&1 || (echo "pre-commit not found" && exit 1)
       - echo "All dependencies satisfied"

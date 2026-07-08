@@ -20,6 +20,10 @@ Terraform bootstrap for an HCP Vault cluster with GitHub Actions CI/CD integrati
   hcp auth login
   hcp profile init
   ```
+- [Vault CLI](https://developer.hashicorp.com/vault/install)
+  ```sh
+  brew install hashicorp/tap/vault
+  ```
 
 ## Setup
 
