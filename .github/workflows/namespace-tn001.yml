@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'namespace-tn001/**'
+  pull_request:
+    paths:
+      - 'namespace-tn001/**'
 
 jobs:
   apply:
