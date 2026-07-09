@@ -9,6 +9,10 @@ on:
       - 'namespace-tn001/**'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   apply:
     uses: ./.github/workflows/_terraform-namespace.yml
