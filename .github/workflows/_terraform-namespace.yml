@@ -32,6 +32,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          cli_config_credentials_token: ${{ secrets.TFE_TOKEN }}
 
       - name: Authenticate to Vault
         uses: hashicorp/vault-action@v3
