@@ -1,0 +1,14 @@
+name: namespace-admin
+
+on:
+  push:
+    paths:
+      - 'namespace-admin/**'
+
+jobs:
+  apply:
+    uses: ./.github/workflows/_terraform-namespace.yml
+    with:
+      namespace: namespace-admin
+      vault_role: github-admin
+    secrets: inherit

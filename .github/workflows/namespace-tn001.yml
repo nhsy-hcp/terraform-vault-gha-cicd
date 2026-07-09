@@ -1,0 +1,14 @@
+name: namespace-tn001
+
+on:
+  push:
+    paths:
+      - 'namespace-tn001/**'
+
+jobs:
+  apply:
+    uses: ./.github/workflows/_terraform-namespace.yml
+    with:
+      namespace: namespace-tn001
+      vault_role: github-namespace-tn001
+    secrets: inherit

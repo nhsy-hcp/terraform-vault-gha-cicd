@@ -5,7 +5,9 @@
 *.tfstate.backup
 *.tfplan
 terraform.tfvars
+!namespace-admin/terraform.tfvars
 
 # Local
 .tmp/
+.plans/
 .idea/

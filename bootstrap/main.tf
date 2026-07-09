@@ -8,12 +8,31 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.9"
     }
+    tfe = {
+      source  = "hashicorp/tfe"
+      version = "~> 0.78"
+    }
+    vault = {
+      source  = "hashicorp/vault"
+      version = "~> 5.10"
+    }
   }
   required_version = ">= 1.9, < 2.0"
 }
 
 provider "hcp" {
   project_id = var.project_id
+}
+
+provider "vault" {
+  address   = hcp_vault_cluster.vault_cluster.vault_public_endpoint_url
+  token     = hcp_vault_cluster_admin_token.admin_token.token
+  namespace = "admin"
+}
+
+provider "tfe" {
+  organization = var.organization
+  # token supplied via TFE_TOKEN / credentials.tfrc.json — never hardcoded
 }
 
 resource "random_pet" "default" {

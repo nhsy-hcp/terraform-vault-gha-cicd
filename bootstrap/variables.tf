@@ -3,6 +3,24 @@ variable "project_id" {
   type        = string
 }
 
+variable "organization" {
+  description = "HCP Terraform organization"
+  type        = string
+  default     = "nhsy-hcp-org"
+}
+
+variable "project_name" {
+  description = "HCP Terraform project name (equals the repo name)"
+  type        = string
+  default     = "terraform-vault-gha-cicd"
+}
+
+variable "namespaces" {
+  description = "Day-2 modules needing a remote-state workspace"
+  type        = list(string)
+  default     = ["namespace-admin", "namespace-tn001"]
+}
+
 variable "hvn_id" {
   description = "The ID of the HashiCorp Virtual Network (HVN)"
   type        = string
@@ -53,4 +71,10 @@ variable "public_endpoint" {
   description = "Whether the Vault cluster should have a public endpoint"
   type        = bool
   default     = true
+}
+
+variable "vault_namespaces" {
+  description = "List of child namespace paths to create under admin"
+  type        = list(string)
+  default     = []
 }

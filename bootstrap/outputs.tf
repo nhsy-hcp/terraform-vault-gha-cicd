@@ -77,3 +77,29 @@ output "vault_env_eval" {
   description = "Command to eval vault environment exports"
   value       = "eval \"$(task bootstrap:env)\""
 }
+
+output "vault_namespaces" {
+  description = "Created Vault child namespace paths"
+  value       = [for ns in vault_namespace.namespaces : ns.path]
+}
+
+output "tfe_project_id" {
+  description = "ID of the HCP Terraform project"
+  value       = tfe_project.main.id
+}
+
+output "tfe_team_id" {
+  description = "ID of the HCP Terraform CI team"
+  value       = tfe_team.gha_cicd.id
+}
+
+output "tfe_workspace_ids" {
+  description = "Map of namespace to HCP Terraform workspace ID"
+  value       = { for k, m in module.namespace_workspace : k => m.workspace_id }
+}
+
+output "tfe_team_token" {
+  description = "Team token to set as the TFE_TOKEN GitHub Actions secret"
+  value       = tfe_team_token.gha_cicd.token
+  sensitive   = true
+}

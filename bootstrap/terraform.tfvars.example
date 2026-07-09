@@ -14,3 +14,12 @@ public_endpoint = true
 # Cloud Provider (aws or azure)
 cloud_provider = "aws"
 
+# HCP Terraform provisioning
+organization = "nhsy-hcp-org"
+project_name = "terraform-vault-gha-cicd"
+
+# Vault child namespaces to create under admin
+vault_namespaces = ["tn001"]
+
+# Day-2 modules that need a remote-state workspace
+namespaces = ["namespace-admin", "namespace-tn001"]
