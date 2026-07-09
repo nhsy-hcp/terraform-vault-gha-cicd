@@ -49,11 +49,35 @@ jobs:
         run: terraform init
 
       - name: Terraform plan
-        run: terraform plan
+        id: plan
+        run: terraform plan 2>&1 | tee plan.log; exit ${PIPESTATUS[0]}
+
+      - name: Terraform force-unlock (plan)
+        if: failure() && steps.plan.outcome == 'failure'
+        run: |
+          lock_id=$(grep -oE 'ID:[[:space:]]+[0-9a-f-]{36}' plan.log | head -n1 | awk '{print $2}')
+          if [ -n "$lock_id" ]; then
+            echo "Releasing Terraform state lock $lock_id"
+            terraform force-unlock -force "$lock_id"
+          else
+            echo "No Terraform state lock detected; nothing to unlock"
+          fi
 
       - name: Terraform apply
+        id: apply
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve 2>&1 | tee apply.log; exit ${PIPESTATUS[0]}
+
+      - name: Terraform force-unlock (apply)
+        if: failure() && steps.apply.outcome == 'failure'
+        run: |
+          lock_id=$(grep -oE 'ID:[[:space:]]+[0-9a-f-]{36}' apply.log | head -n1 | awk '{print $2}')
+          if [ -n "$lock_id" ]; then
+            echo "Releasing Terraform state lock $lock_id"
+            terraform force-unlock -force "$lock_id"
+          else
+            echo "No Terraform state lock detected; nothing to unlock"
+          fi
 
       - name: Revoke Vault token
         if: always()
