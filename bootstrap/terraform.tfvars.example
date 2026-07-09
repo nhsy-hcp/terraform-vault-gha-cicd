@@ -23,3 +23,7 @@ vault_namespaces = ["tn001"]
 
 # Day-2 modules that need a remote-state workspace
 namespaces = ["namespace-admin", "namespace-tn001"]
+
+# GitHub repository bound to the JWT auth roles
+github_organization = "nhsy-hcp"
+github_repository   = "terraform-vault-gha-cicd"

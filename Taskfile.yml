@@ -102,6 +102,37 @@ tasks:
     cmds:
       - terraform output -raw vault_env_exports
 
+  bootstrap:tfe-token:
+    desc: Print the HCP Terraform team token (set as the TFE_TOKEN GitHub secret)
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform output -raw tfe_team_token
+
+  bootstrap:vault-token:
+    desc: Copy the Vault cluster admin token to the clipboard
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform output -raw vault_admin_token | pbcopy
+
+  vault:ui:
+    desc: Open the Vault UI in the browser
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - open "$(terraform output -raw vault_public_endpoint_url)"
+
+  bootstrap:vault-addr:
+    desc: Print the Vault public endpoint URL (set as the VAULT_ADDR GitHub variable)
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform output -raw vault_public_endpoint_url
+
+  bootstrap:gh-config:
+    desc: Set the VAULT_ADDR variable and TFE_TOKEN secret on the GitHub repo
+    dir: "{{.BOOTSTRAP_DIR}}"
+    cmds:
+      - terraform output -raw vault_public_endpoint_url | gh variable set VAULT_ADDR
+      - terraform output -raw tfe_team_token | gh secret set TFE_TOKEN
+
   bootstrap:clean:
     desc: Remove local Terraform cache for bootstrap
     dir: "{{.BOOTSTRAP_DIR}}"

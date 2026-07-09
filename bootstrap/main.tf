@@ -12,6 +12,10 @@ terraform {
       source  = "hashicorp/tfe"
       version = "~> 0.78"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.12"
+    }
     vault = {
       source  = "hashicorp/vault"
       version = "~> 5.10"

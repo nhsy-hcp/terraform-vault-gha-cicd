@@ -80,6 +80,11 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 | `task bootstrap:apply:vault` | First-time: create the Vault child namespaces |
 | `task bootstrap:output` | Show all bootstrap outputs |
 | `task bootstrap:env` | Print `VAULT_ADDR` / `VAULT_TOKEN` exports |
+| `task bootstrap:vault-addr` | Print the Vault public endpoint URL |
+| `task bootstrap:vault-token` | Copy the Vault admin token to the clipboard |
+| `task bootstrap:tfe-token` | Print the HCP Terraform team token |
+| `task bootstrap:gh-config` | Set the `VAULT_ADDR` variable and `TFE_TOKEN` secret on the repo |
+| `task vault:ui` | Open the Vault UI in the browser |
 | `task namespace-admin:plan` | Preview admin-namespace changes |
 | `task namespace-admin:apply` | Apply admin-namespace config |
 | `task namespace-admin:env` | Print `TF_VAR_vault_addr` / `TF_VAR_vault_token` exports |
@@ -96,9 +101,13 @@ scoped Vault token via `hashicorp/vault-action` and revokes it on completion.
 
 Required repository configuration:
 
-- **Variable** `VAULT_ADDR` — public endpoint URL (`task bootstrap:output`).
+- **Variable** `VAULT_ADDR` — public endpoint URL (`task bootstrap:vault-addr | gh variable set VAULT_ADDR`).
 - **Secret** `TFE_TOKEN` — HCP Terraform team token for the `cloud {}` backend
-  (`task bootstrap:output -raw tfe_team_token | gh secret set TFE_TOKEN`).
+  (`task bootstrap:tfe-token | gh secret set TFE_TOKEN`).
+
+Set both at once with `task bootstrap:gh-config`. The `TFE_TOKEN` team token is
+rotated on a 7-day schedule (`time_rotating` in `bootstrap/tfe.tf`); re-run the
+task after each rotation to refresh the secret.
 
 ## Onboarding a new namespace (`tn002`)
 

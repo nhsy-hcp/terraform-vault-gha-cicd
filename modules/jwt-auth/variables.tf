@@ -37,12 +37,13 @@ variable "path" {
 variable "roles" {
   description = "Map of JWT auth backend roles keyed by role name."
   type = map(object({
-    bound_claims   = map(string)
-    role_type      = optional(string, "jwt")
-    token_max_ttl  = optional(number)
-    token_policies = list(string)
-    token_ttl      = optional(number)
-    user_claim     = string
+    bound_audiences = optional(list(string))
+    bound_claims    = map(string)
+    role_type       = optional(string, "jwt")
+    token_max_ttl   = optional(number)
+    token_policies  = list(string)
+    token_ttl       = optional(number)
+    user_claim      = string
   }))
   default = {}
 }

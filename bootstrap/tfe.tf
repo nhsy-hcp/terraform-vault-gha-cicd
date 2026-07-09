@@ -14,8 +14,13 @@ resource "tfe_team_project_access" "gha_cicd" {
   project_id = tfe_project.main.id
 }
 
+resource "time_rotating" "team_token" {
+  rotation_days = 7
+}
+
 resource "tfe_team_token" "gha_cicd" {
-  team_id = tfe_team.gha_cicd.id
+  team_id    = tfe_team.gha_cicd.id
+  expired_at = time_rotating.team_token.rotation_rfc3339
 }
 
 module "namespace_workspace" {

@@ -1,9 +1,0 @@
-# vault_addr and vault_token are supplied at runtime via TF_VAR_vault_addr and
-# TF_VAR_vault_token (see `task namespace-admin:env`) — never commit them.
-
-github_organization = "nhsy-hcp"
-github_repository   = "terraform-vault-gha-cicd"
-
-# Child namespaces (under admin) to provision per-namespace roles and policies
-# for. Keep in sync with bootstrap/ vault_namespaces.
-vault_namespaces = ["tn001"]
