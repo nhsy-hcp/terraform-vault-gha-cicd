@@ -23,11 +23,6 @@ provider "vault" {
 
 # Day-2 configuration for the admin/tn001 tenant namespace.
 #
-# This module is a stub: the gha-namespace-admin policy is provisioned inside
-# admin/tn001 by namespace-admin/. Add tenant secret engines here using the
-# reusable modules in ../modules, e.g.:
-#
-# module "kv" {
-#   source = "../modules/kv-engine"
-#   path   = "kv"
-# }
+# The gha-namespace-admin policy is provisioned inside admin/tn001 by
+# namespace-admin/. Secret engines are defined in their own files:
+#   pki.tf — PKI intermediate CA (offline-root pattern)
