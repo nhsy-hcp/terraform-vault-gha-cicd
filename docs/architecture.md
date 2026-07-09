@@ -73,7 +73,7 @@ authentication and per-namespace role/policy provisioning, while each tenant nam
 |---|---|---|
 | `bootstrap/` | HCP HVN + Vault cluster + admin token + child namespace creation | Local |
 | `namespace-admin/` | Day-2 config for the `admin` namespace: JWT auth, roles, policies | HCP Terraform (`nhsy-hcp-org` / `namespace-admin`) |
-| `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace (stub, deferred) | HCP Terraform (`nhsy-hcp-org` / `namespace-tn001`) |
+| `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace: PKI intermediate CA | HCP Terraform (`nhsy-hcp-org` / `namespace-tn001`) |
 | `policies/` | Reusable ACL policy HCL (e.g. `gha-namespace-admin.hcl`) | — |
 | `modules/` | Reusable Terraform modules for Vault secret engines & auth methods | — |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows | — |
@@ -101,39 +101,30 @@ target namespace), and exposes sensible defaults.
 | Module | Purpose | Key inputs | Key outputs |
 |---|---|---|---|
 | `modules/kv-engine` | Mount a KV v2 secrets engine | `path`, `description`, `max_versions`, `cas_required`, `delete_version_after` | `path`, `accessor` |
-| `modules/pki-engine` | Mount + configure a PKI secrets engine (CA + issuing roles) | `path`, `max_lease_ttl`, `common_name`, `ttl`, `key_type`, `key_bits`, `roles` | `path`, `accessor`, `issuing_ca` |
+| `modules/pki-intermediate` | Mount a PKI intermediate CA, sign via an offline root, and configure issuing roles | `path`, `root_ca_backend`, `common_name`, `ttl`, `key_type`, `key_bits`, `roles`, `issuing_certificates`, `crl_distribution_points` | `path`, `accessor`, `certificate`, `issuing_ca` |
 | `modules/jwt-auth` | Mount a JWT/OIDC auth method and create bound-claim roles | `path`, `oidc_discovery_url` / `bound_issuer`, `default_lease_ttl`, `max_lease_ttl`, `roles` (`user_claim`, `bound_claims`, `token_policies`, TTLs) | `path`, `accessor`, `role_names` |
+| `modules/hcp-tf-workspace` | Provision a remote-state-only HCP Terraform workspace (`execution_mode = "local"`) | `name`, `organization`, `project_id`, `tags`, `terraform_version` | `workspace_id`, `workspace_name` |
+| `modules/acl-policy` | DRY creation of Vault ACL policies from HCL templates | `name`, `policy` (HCL string) | `name` |
+| `modules/namespace` | Consistent child-namespace creation | `paths` (list) | `namespace_paths` |
 
-#### `modules/kv-engine` (example)
+#### `modules/kv-engine`
 
 Wraps `vault_mount` (type `kv-v2`). Provides versioned key/value storage for tenant
 application secrets. Defaults to `max_versions = 10` and optional check-and-set.
 
-#### `modules/pki-engine` (example)
+#### `modules/pki-intermediate`
 
-Wraps `vault_mount` (type `pki`) plus `vault_pki_secret_backend_root_cert` (or intermediate)
-and `vault_pki_secret_backend_role` (`for_each` over `var.roles`). Issues short-lived
-X.509 certificates for internal services. Enforces a bounded `max_lease_ttl`.
+Wraps `vault_mount` (type `pki`), `vault_pki_secret_backend_intermediate_cert_request`,
+`vault_pki_secret_backend_root_sign_intermediate`, `vault_pki_secret_backend_intermediate_set_signed`,
+and `vault_pki_secret_backend_role` (`for_each` over `var.roles`). Implements the offline-root
+CA pattern: the root CA lives outside Vault (e.g. OpenSSL self-signed), and Vault manages
+only the intermediate CA. Enforces a bounded `max_lease_ttl`.
 
-#### `modules/jwt-auth` (example)
+#### `modules/jwt-auth`
 
 Generalises the `jwt_github` backend described in §5. Wraps `vault_jwt_auth_backend` plus
 `vault_jwt_auth_backend_role` (`for_each` over `var.roles`), so both the admin `jwt_github`
 mount and any tenant-owned OIDC/JWT integration are provisioned from the same code path.
-
-#### Candidate modules (recommended next)
-
-The following are **not required for the current CI/CD flow** but round out a self-service
-tenant platform; add them as demand appears:
-
-| Module | Why | Wraps |
-|---|---|---|
-| `modules/hcp-tf-workspace` | Provision HCP Terraform workspaces used **only** as a remote state backend (no VCS/runs) | `tfe_workspace`, `tfe_variable` |
-| `modules/acl-policy` | DRY creation of ACL policies from HCL templates | `vault_policy` |
-| `modules/namespace` | Consistent child-namespace creation (used by `bootstrap/`) | `vault_namespace` |
-| `modules/database-secrets` | Dynamic, short-lived DB credentials | `vault_database_secret_backend_connection`, `_role` |
-| `modules/transit` | Encryption-as-a-service (encrypt/decrypt without exposing keys) | `vault_mount` (`transit`), `vault_transit_secret_backend_key` |
-| `modules/approle` | Auth for non-GitHub workloads that can't use OIDC | `vault_auth_backend` (`approle`), `vault_approle_auth_backend_role` |
 
 #### `modules/hcp-tf-workspace` (remote-state-only)
 
@@ -146,15 +137,17 @@ a consistently configured workspace. It is deliberately **state-backend-only**:
 - No VCS connection and no remote plan/apply — avoids double execution and keeps the OIDC
   → Vault trust flow (§2) the single source of run auth.
 - Inputs: `name`, `organization` (`nhsy-hcp-org`), `project`, `tags`, optional
-  `terraform_version` (default `1.15.8` — latest stable). Outputs: `workspace_id`,
-  `workspace_name`.
+  `terraform_version`. Outputs: `workspace_id`, `workspace_name`.
 
-**Recommendation:** implement `kv-engine`, `pki-engine`, and `jwt-auth` now (they cover the
-common secret-engine and auth patterns and let §5's `jwt_github` config be refactored onto a
-shared module). Add `hcp-tf-workspace` alongside them so each module's HCP Terraform
-backend (§8) is provisioned as code, then `acl-policy` and `namespace` next, since existing `bootstrap/` and
-`policies/` logic maps directly onto them; treat `database-secrets`, `transit`, and
-`approle` as on-demand.
+#### Candidate modules (on-demand)
+
+The following are **not required for the current CI/CD flow**; add them as demand appears:
+
+| Module | Why | Wraps |
+|---|---|---|
+| `modules/database-secrets` | Dynamic, short-lived DB credentials | `vault_database_secret_backend_connection`, `_role` |
+| `modules/transit` | Encryption-as-a-service (encrypt/decrypt without exposing keys) | `vault_mount` (`transit`), `vault_transit_secret_backend_key` |
+| `modules/approle` | Auth for non-GitHub workloads that can't use OIDC | `vault_auth_backend` (`approle`), `vault_approle_auth_backend_role` |
 
 ### 3.2 HCP Terraform Provisioning (in `bootstrap/`)
 
@@ -456,7 +449,7 @@ Variables (GitHub Actions environment variables):
 | Namespace | Managed by | Contents |
 |---|---|---|
 | `admin` | `namespace-admin/` | `jwt_github` auth, all roles, `github-admin` + `self-token-admin` policies, per-namespace role/policy provisioning |
-| `admin/tn001` | `namespace-tn001/` (stub) | Tenant day-2 config; `gha-namespace-admin` policy applied inside |
+| `admin/tn001` | `namespace-tn001/` | PKI intermediate CA (`pki-int` mount); `gha-namespace-admin` policy applied inside |
 
 Tenant namespaces are created by `bootstrap/` but **configured** by their own day-2
 modules, keeping each tenant's blast radius contained.
@@ -488,6 +481,22 @@ Local development is driven by `Taskfile.yml`. Representative tasks:
 - `deps`, `lint` — dependency checks and `pre-commit` (gitleaks, terraform fmt/tflint).
 - `bootstrap:{init,lock,plan,apply,apply:hcp,apply:vault,destroy,output,env,clean}`.
 - `namespace-admin:{init,lock,validate,fmt,plan,apply,destroy,output,env,clean}`.
+- `namespace-tn001:{init,lock,validate,fmt,plan,apply,destroy,output,clean}`.
+
+#### PKI tasks (`pki:*`)
+
+Operational helpers for the offline-root CA workflow in `namespace-tn001/`:
+
+| Task | Description |
+|---|---|
+| `pki:root:generate` | Generate a self-signed root CA key and certificate with OpenSSL (`openssl req -newkey rsa:4096 -x509`) into `namespace-tn001/.pki/` |
+| `pki:root:view` | Display root CA certificate details (`openssl x509 -noout -text`) |
+| `pki:int:csr` | Retrieve the intermediate CSR from the Vault mount and write it to `namespace-tn001/.pki/intermediate.csr` |
+| `pki:int:sign` | Sign the intermediate CSR with the offline root CA (`openssl x509 -req -CA`) and write `intermediate-signed.crt` |
+| `pki:int:verify` | Verify the certificate chain: intermediate against root |
+| `pki:int:import` | Import the signed intermediate certificate into Vault via the CLI (`vault write pki-int/intermediate/set-signed`) |
+
+> **Note:** `.pki/` is gitignored — private keys and signed certificates are never committed.
 
 ### First-time end-to-end flow
 
@@ -530,7 +539,7 @@ task namespace-admin:apply          # JWT auth, roles, policies
 |---|---|
 | Secrets platform | HCP Vault |
 | IaC | Terraform (`>= 1.9, < 2.0`) |
-| Providers | `hashicorp/hcp` (~> 0.112), `hashicorp/vault` (~> 5.10), `hashicorp/random` (~> 3.9) |
+| Providers | `hashicorp/hcp` (~> 0.112), `hashicorp/vault` (~> 5.10), `hashicorp/tfe` (~> 0.78), `hashicorp/random` (~> 3.9), `hashicorp/time` (~> 0.14) |
 | CI/CD | GitHub Actions (OIDC) |
 | Auth exchange | Vault JWT auth method + `hashicorp/vault-action` |
 | Remote state | HCP Terraform (`namespace-admin`, `namespace-tn001`); local state (`bootstrap`) |
@@ -538,8 +547,9 @@ task namespace-admin:apply          # JWT auth, roles, policies
 | Quality gates | `pre-commit` — gitleaks, terraform fmt, tflint |
 
 > **Status:** Implemented — `bootstrap/` (HCP cluster + child namespaces + HCP Terraform
-> project/team/token/workspaces), the reusable `modules/` (`kv-engine`, `pki-engine`,
+> project/team/token/workspaces), the reusable `modules/` (`kv-engine`, `pki-intermediate`,
 > `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace`), `namespace-admin/` (JWT auth,
-> roles, policies), the `namespace-tn001/` stub, `policies/gha-namespace-admin.hcl`, and the
-> GitHub Actions workflows. The on-demand candidate modules (`database-secrets`, `transit`,
-> `approle`) remain unimplemented by design.
+> roles, policies), `namespace-tn001/` (PKI intermediate CA — feature branch
+> `feat/pki-engine-tn001`), `policies/gha-namespace-admin.hcl`, and the GitHub Actions
+> workflows. The on-demand candidate modules (`database-secrets`, `transit`, `approle`)
+> remain unimplemented by design.

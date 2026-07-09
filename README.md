@@ -9,7 +9,7 @@ its short-lived GitHub OIDC token for a scoped Vault token. Authorization is enf
 through Vault **namespaces**, **JWT roles** (bound to specific repositories and workflows),
 and least-privilege **ACL policies**.
 
-See [`doc/architecture.md`](doc/architecture.md) for the full design.
+See [`docs/architecture.md`](docs/architecture.md) for the full design.
 
 ## Layout
 
