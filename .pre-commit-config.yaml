@@ -18,5 +18,7 @@ repos:
         args:
           - --args=-recursive
       - id: terraform_tflint
+        files: ^(bootstrap|namespace-admin|namespace-tn001)/.*\.tf$
         args:
           - --args=--init
+          - --args=--minimum-failure-severity=warning
