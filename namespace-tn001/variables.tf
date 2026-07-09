@@ -8,4 +8,5 @@ variable "pki_roles" {
     key_type         = optional(string, "ec")
     key_bits         = optional(number, 256)
   }))
+  default = {}
 }
