@@ -6,6 +6,9 @@
 *.tfplan
 terraform.tfvars
 
+# PKI offline root CA artefacts (private keys must never be committed)
+**/.pki/
+
 # Local
 .tmp/
 .plans/
