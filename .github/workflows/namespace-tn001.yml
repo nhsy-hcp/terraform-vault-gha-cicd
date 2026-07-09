@@ -14,7 +14,11 @@ permissions:
   id-token: write
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+
   apply:
+    needs: lint
     uses: ./.github/workflows/_terraform-namespace.yml
     with:
       namespace: namespace-tn001
