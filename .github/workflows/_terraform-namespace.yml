@@ -17,7 +17,8 @@ permissions:
   id-token: write
 
 jobs:
-  apply:
+  terraform:
+    name: "Terraform (${{ inputs.namespace }})"
     runs-on: ubuntu-latest
     timeout-minutes: 5
     defaults:
