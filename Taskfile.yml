@@ -4,6 +4,7 @@ vars:
   BOOTSTRAP_DIR: bootstrap
   NAMESPACE_ADMIN_DIR: namespace-admin
   NAMESPACE_TN001_DIR: namespace-tn001
+  ACT_ARCH: linux/amd64
 
 tasks:
   # ---------------------------------------------------------------------------
@@ -22,6 +23,14 @@ tasks:
       - command -v hcp >/dev/null 2>&1 || (echo "hcp not found" && exit 1)
       - command -v pre-commit >/dev/null 2>&1 || (echo "pre-commit not found" && exit 1)
       - echo "All dependencies satisfied"
+
+  test:ci:
+    desc: Validate the GitHub Actions workflows locally with act (validate + dry-run, no execution)
+    cmds:
+      - 'command -v act >/dev/null 2>&1 || (echo "act not found - see https://github.com/nektos/act" && exit 1)'
+      - act --validate
+      - 'act pull_request --dryrun --container-architecture {{.ACT_ARCH}} -W .github/workflows/namespace-admin.yml'
+      - 'act pull_request --dryrun --container-architecture {{.ACT_ARCH}} -W .github/workflows/namespace-tn001.yml'
 
   # ---------------------------------------------------------------------------
   # bootstrap namespace

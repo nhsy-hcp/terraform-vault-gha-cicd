@@ -1,0 +1,17 @@
+extends: default
+
+rules:
+  line-length:
+    max: 200
+    level: warning
+  # GitHub Actions uses `on:` which yamllint treats as a truthy key.
+  truthy:
+    check-keys: false
+  document-start:
+    present: false
+  comments:
+    min-spaces-from-content: 1
+
+ignore: |
+  .terraform/
+  .tmp/
