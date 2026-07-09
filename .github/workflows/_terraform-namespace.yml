@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   terraform:
-    name: "Terraform (${{ inputs.namespace }})"
+    name: "terraform (${{ inputs.namespace }})"
     runs-on: ubuntu-latest
     timeout-minutes: 5
     defaults:
