@@ -50,7 +50,8 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform plan 2>&1 | tee plan.log; exit ${PIPESTATUS[0]}
+        run: |
+          terraform plan -detailed-exitcode 2>&1 | tee plan.log; exit ${PIPESTATUS[0]}
 
       - name: Terraform force-unlock (plan)
         if: failure() && steps.plan.outcome == 'failure'
@@ -65,7 +66,7 @@ jobs:
 
       - name: Terraform apply
         id: apply
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && steps.plan.outcome == 'success' && steps.plan.outputs.exitcode == '2'
         run: terraform apply -auto-approve 2>&1 | tee apply.log; exit ${PIPESTATUS[0]}
 
       - name: Terraform force-unlock (apply)
