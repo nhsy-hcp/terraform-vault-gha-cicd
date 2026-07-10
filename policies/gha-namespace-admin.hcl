@@ -82,3 +82,11 @@ path "sys/remount" {
 path "sys/remount/*" {
   capabilities = ["read", "list"]
 }
+
+path "pki-int/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
+path "pki-int" {
+  capabilities = ["read", "list"]
+}
