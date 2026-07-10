@@ -83,7 +83,7 @@ jobs:
         if: always()
         run: |
           curl -s --fail \
-            --header "X-Vault-Token: ${{ env.VAULT_TOKEN }}" \
+            --header "X-Vault-Token: $VAULT_TOKEN" \
             --header "X-Vault-Namespace: admin" \
             --request POST \
             "${VAULT_ADDR}/v1/auth/token/revoke-self"

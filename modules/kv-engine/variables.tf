@@ -5,9 +5,9 @@ variable "cas_required" {
 }
 
 variable "delete_version_after" {
-  description = "Duration after which deleted KV v2 versions are permanently deleted."
-  type        = string
-  default     = "0s"
+  description = "Number of seconds after which deleted KV v2 versions are permanently deleted. 0 disables automatic deletion."
+  type        = number
+  default     = 0
 }
 
 variable "description" {

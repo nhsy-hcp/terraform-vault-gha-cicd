@@ -7,3 +7,10 @@ resource "vault_mount" "this" {
     version = "2"
   }
 }
+
+resource "vault_kv_secret_backend_v2" "config" {
+  mount                = vault_mount.this.path
+  max_versions         = var.max_versions
+  cas_required         = var.cas_required
+  delete_version_after = var.delete_version_after
+}
