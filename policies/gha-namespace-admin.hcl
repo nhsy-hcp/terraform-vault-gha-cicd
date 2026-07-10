@@ -19,9 +19,14 @@ path "sys/policies/acl" {
 #   capabilities = ["update"]
 # }
 
+# Uncomment to allow orphan token creation (use instead of auth/token/create)
 # path "auth/token/create-orphan" {
 #   capabilities = ["update"]
 # }
+
+path "auth/token/create" {
+  capabilities = ["update"]
+}
 
 path "sys/namespaces/*" {
   capabilities = ["read", "update", "delete"]
