@@ -67,6 +67,10 @@ path "sys/mounts/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
+path "sys/mounts/pki-int" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
 path "sys/remount" {
   capabilities = ["update", "sudo"]
 }
