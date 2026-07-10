@@ -63,6 +63,10 @@ path "sys/quotas/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
+path "sys/mounts" {
+  capabilities = ["read", "list"]
+}
+
 path "sys/mounts/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
