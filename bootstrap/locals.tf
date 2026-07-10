@@ -22,11 +22,12 @@ locals {
   # the specific workflow file for that namespace can assume the role.
   namespace_roles = {
     for ns in var.vault_namespaces : "github-namespace-${ns}" => {
-      user_claim      = "workflow"
-      bound_audiences = local.bound_audiences
+      user_claim        = "job_workflow_ref"
+      bound_audiences   = local.bound_audiences
+      bound_claims_type = "glob"
       bound_claims = {
-        repository = local.bound_repository
-        workflow   = "namespace-${ns}"
+        repository       = local.bound_repository
+        job_workflow_ref = "${local.bound_repository}/.github/workflows/namespace-${ns}.yml@*"
       }
       token_policies = ["self-token-admin", "gha-namespace-admin"]
     }
