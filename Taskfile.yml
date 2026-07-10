@@ -22,6 +22,7 @@ tasks:
       - command -v vault >/dev/null 2>&1 || (echo "vault not found" && exit 1)
       - command -v hcp >/dev/null 2>&1 || (echo "hcp not found" && exit 1)
       - command -v pre-commit >/dev/null 2>&1 || (echo "pre-commit not found" && exit 1)
+      - command -v act >/dev/null 2>&1 || (echo "act not found - see https://github.com/nektos/act" && exit 1)
       - echo "All dependencies satisfied"
 
   test:ci:
