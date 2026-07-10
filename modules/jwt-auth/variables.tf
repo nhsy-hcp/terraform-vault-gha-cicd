@@ -1,3 +1,9 @@
+variable "namespace" {
+  description = "Vault namespace to create the JWT auth backend in. Leave empty to use the provider default."
+  type        = string
+  default     = ""
+}
+
 variable "bound_issuer" {
   description = "Expected issuer claim for JWTs. Leave empty to omit issuer binding."
   type        = string

@@ -23,4 +23,5 @@ jobs:
     with:
       namespace: namespace-tn001
       vault_role: github-namespace-tn001
+      vault_namespace: admin/tn001
     secrets: inherit

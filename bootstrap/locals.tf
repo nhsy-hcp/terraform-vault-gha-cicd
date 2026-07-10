@@ -18,8 +18,8 @@ locals {
     }
   }
 
-  # One role per tenant namespace, bound to both repository and workflow so only
-  # the specific workflow file for that namespace can assume the role.
+  # One role per tenant namespace, mounted inside each child namespace so the
+  # token is issued in admin/<ns> and gha-namespace-admin resolves correctly.
   namespace_roles = {
     for ns in var.vault_namespaces : "github-namespace-${ns}" => {
       user_claim      = "workflow"
@@ -32,5 +32,5 @@ locals {
     }
   }
 
-  jwt_roles = merge(local.admin_role, local.namespace_roles)
+  jwt_roles = local.admin_role
 }

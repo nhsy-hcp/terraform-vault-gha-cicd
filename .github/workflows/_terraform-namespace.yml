@@ -11,6 +11,11 @@ on:
         description: Vault JWT auth role
         required: true
         type: string
+      vault_namespace:
+        description: Vault namespace to authenticate against
+        required: false
+        type: string
+        default: admin
 
 permissions:
   contents: read
@@ -41,7 +46,7 @@ jobs:
           exportToken: true
           url: ${{ env.VAULT_ADDR }}
           method: jwt
-          namespace: admin
+          namespace: ${{ inputs.vault_namespace }}
           path: jwt_github
           role: ${{ inputs.vault_role }}
 

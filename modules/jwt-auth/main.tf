@@ -1,4 +1,5 @@
 resource "vault_jwt_auth_backend" "this" {
+  namespace          = var.namespace != "" ? var.namespace : null
   path               = var.path
   description        = var.description
   oidc_discovery_url = var.oidc_discovery_url
@@ -14,6 +15,7 @@ resource "vault_jwt_auth_backend" "this" {
 resource "vault_jwt_auth_backend_role" "this" {
   for_each = var.roles
 
+  namespace       = var.namespace != "" ? var.namespace : null
   backend         = vault_jwt_auth_backend.this.path
   role_name       = each.key
   role_type       = each.value.role_type
