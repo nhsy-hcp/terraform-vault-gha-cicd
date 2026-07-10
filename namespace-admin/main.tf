@@ -18,6 +18,5 @@ terraform {
 }
 
 provider "vault" {
-  namespace        = "admin"
-  skip_child_token = true
+  namespace = "admin"
 }

@@ -18,8 +18,7 @@ terraform {
 }
 
 provider "vault" {
-  namespace        = "admin/tn001"
-  skip_child_token = true
+  namespace = "admin/tn001"
 }
 
 # Day-2 configuration for the admin/tn001 tenant namespace.
