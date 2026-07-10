@@ -15,9 +15,13 @@ path "sys/policies/acl" {
   capabilities = ["list"]
 }
 
-path "auth/token/create" {
-  capabilities = ["update"]
-}
+# path "auth/token/create" {
+#   capabilities = ["update"]
+# }
+
+# path "auth/token/create-orphan" {
+#   capabilities = ["update"]
+# }
 
 path "sys/namespaces/*" {
   capabilities = ["read", "update", "delete"]
