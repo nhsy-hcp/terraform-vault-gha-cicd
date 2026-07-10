@@ -45,6 +45,12 @@ variable "key_type" {
   default     = "ec"
 }
 
+variable "default_lease_ttl" {
+  description = "Default lease TTL for the intermediate PKI mount in seconds (default 30 days)."
+  type        = number
+  default     = 2592000
+}
+
 variable "max_lease_ttl" {
   description = "Maximum lease TTL for the intermediate PKI mount in seconds (default 1 year)."
   type        = number

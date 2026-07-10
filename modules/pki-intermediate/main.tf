@@ -1,8 +1,9 @@
 resource "vault_mount" "this" {
-  path                  = var.path
-  type                  = "pki"
-  description           = var.description
-  max_lease_ttl_seconds = var.max_lease_ttl
+  path                      = var.path
+  type                      = "pki"
+  description               = var.description
+  default_lease_ttl_seconds = var.default_lease_ttl
+  max_lease_ttl_seconds     = var.max_lease_ttl
 }
 
 resource "vault_pki_secret_backend_intermediate_cert_request" "this" {
