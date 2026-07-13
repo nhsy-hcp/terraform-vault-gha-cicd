@@ -16,9 +16,9 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design.
 | Path | Purpose | State |
 |---|---|---|
 | `bootstrap/` | HCP HVN + Vault cluster + admin token, child namespaces, and HCP Terraform project/team/token + remote-state workspaces | HCP Terraform (`bootstrap`, local execution) |
-| `namespace-admin/` | Day-2 config for the `admin` namespace: `jwt_github` auth, roles, policies | HCP Terraform (`namespace-admin`, local execution) |
-| `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace (stub) | HCP Terraform (`namespace-tn001`, local execution) |
-| `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
+| `namespace-admin/` | Day-2 config for the `admin` namespace: `jwt_github` auth, roles, policies | HCP Terraform (`namespace-admin`, GHA execution) |
+| `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace | HCP Terraform (`namespace-tn001`, GHA execution) |
+| `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `pki-role`, `pki-intermediate`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
 | `policies/` | Reusable ACL policy HCL (`gha-namespace-admin.hcl`) | — |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows | — |
 
@@ -90,6 +90,9 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 | `task vault:ui` | Open the Vault UI in the browser |
 | `task namespace-admin:plan` | Preview admin-namespace changes |
 | `task namespace-admin:env` | Print `TF_VAR_vault_addr` / `TF_VAR_vault_token` exports |
+| `task pki:test` | Run both PKI issue and sign endpoint tests |
+| `task pki:test:issue` | Test PKI issue endpoint (Vault generates key + cert) |
+| `task pki:test:sign` | Test PKI sign endpoint (local CSR signed by Vault) |
 | `task lint` | Run pre-commit checks |
 
 Run `task --list` for the full task set.
@@ -98,7 +101,7 @@ Run `task --list` for the full task set.
 
 Terraform for each namespace runs from a reusable workflow
 (`.github/workflows/_terraform-namespace.yml`) invoked by thin per-namespace callers
-(`namespace-admin.yml`, `namespace-tn001.yml`). Each run exchanges a GitHub OIDC token for a
+(`namespace-admin.yml`, `namespace-tn001.yml`). Jobs are named `lint` → `deploy`. Each run exchanges a GitHub OIDC token for a
 scoped Vault token via `hashicorp/vault-action` and revokes it on completion.
 
 Required repository configuration:

@@ -58,21 +58,22 @@ imported back into Vault.
    task pki:int:import   # imports cert + fetches chain → .tmp/ca-chain.pem
    ```
 
-6. **Define issuing roles** — add entries to `namespace-tn001/terraform.tfvars`
+6. **Define issuing roles** — add entries to `namespace-tn001/terraform.auto.tfvars`
    under `pki_roles`, commit, and push to `main` to apply via CI.
 
    ```hcl
    pki_roles = {
      server = {
-       allowed_domains  = ["example.com"]
-       allow_subdomains = false
-       ttl              = "24h"
-       max_ttl          = "168h"
-       generate_lease   = false
-       no_store         = false
-       key_type         = "ec"
-       key_bits         = 256
-       issuer_ref       = "default"
+       allowed_domains    = ["example.com"]
+       allow_bare_domains = true
+       allow_subdomains   = false
+       ttl                = "24h"
+       max_ttl            = "168h"
+       generate_lease     = false
+       no_store           = false
+       key_type           = "ec"
+       key_bits           = 256
+       issuer_ref         = "default"
      }
    }
    ```
