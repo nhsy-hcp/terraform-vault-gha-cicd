@@ -7,7 +7,7 @@ variable "allowed_domains" {
 variable "allow_subdomains" {
   description = "Whether to allow subdomains of allowed_domains."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "backend" {
@@ -33,10 +33,22 @@ variable "key_type" {
   default     = "ec"
 }
 
-variable "max_ttl" {
-  description = "Maximum TTL for certificates issued by this role (e.g. 720h)."
+variable "issuer_ref" {
+  description = "Reference to the named issuer to use for this role. Defaults to the mount's default issuer."
   type        = string
-  default     = "720h"
+  default     = "default"
+}
+
+variable "max_ttl" {
+  description = "Maximum TTL for certificates issued by this role (e.g. 168h)."
+  type        = string
+  default     = "168h"
+}
+
+variable "ttl" {
+  description = "Default TTL for certificates issued by this role when not specified at request time (e.g. 24h). Must be <= max_ttl."
+  type        = string
+  default     = "24h"
 }
 
 variable "name" {

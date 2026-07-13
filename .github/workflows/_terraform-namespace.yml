@@ -90,6 +90,6 @@ jobs:
         run: |
           curl -s --fail \
             --header "X-Vault-Token: $VAULT_TOKEN" \
-            --header "X-Vault-Namespace: admin" \
+            --header "X-Vault-Namespace: ${{ inputs.vault_namespace }}" \
             --request POST \
             "${VAULT_ADDR}/v1/auth/token/revoke-self"

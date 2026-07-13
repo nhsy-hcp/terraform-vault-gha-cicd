@@ -101,7 +101,7 @@ target namespace), and exposes sensible defaults.
 | Module | Purpose | Key inputs | Key outputs |
 |---|---|---|---|
 | `modules/kv-engine` | Mount a KV v2 secrets engine | `path`, `description`, `max_versions`, `cas_required`, `delete_version_after` | `path`, `accessor` |
-| `modules/pki-intermediate` | Mount a PKI intermediate CA, sign via an offline root, and configure issuing roles | `path`, `root_ca_backend`, `common_name`, `ttl`, `key_type`, `key_bits`, `roles`, `issuing_certificates`, `crl_distribution_points` | `path`, `accessor`, `certificate`, `issuing_ca` |
+| `modules/pki-intermediate` | Mount a PKI intermediate CA and configure CRL/OCSP (offline-root pattern; signing and import performed via CLI tasks) | `path`, `description`, `common_name`, `key_type`, `key_bits`, `default_lease_ttl`, `max_lease_ttl`, `issuing_certificates`, `crl_distribution_points`, `crl_expiry`, `crl_disable`, `ocsp_enable`, `ocsp_expiry` | `path`, `accessor`, `csr` |
 | `modules/jwt-auth` | Mount a JWT/OIDC auth method and create bound-claim roles | `path`, `oidc_discovery_url` / `bound_issuer`, `default_lease_ttl`, `max_lease_ttl`, `roles` (`user_claim`, `bound_claims`, `token_policies`, TTLs) | `path`, `accessor`, `role_names` |
 | `modules/hcp-tf-workspace` | Provision a remote-state-only HCP Terraform workspace (`execution_mode = "local"`) | `name`, `organization`, `project_id`, `tags`, `terraform_version` | `workspace_id`, `workspace_name` |
 | `modules/acl-policy` | DRY creation of Vault ACL policies from HCL templates | `name`, `policy` (HCL string) | `name` |
@@ -115,10 +115,11 @@ application secrets. Defaults to `max_versions = 10` and optional check-and-set.
 #### `modules/pki-intermediate`
 
 Wraps `vault_mount` (type `pki`), `vault_pki_secret_backend_intermediate_cert_request`,
-`vault_pki_secret_backend_root_sign_intermediate`, `vault_pki_secret_backend_intermediate_set_signed`,
-and `vault_pki_secret_backend_role` (`for_each` over `var.roles`). Implements the offline-root
-CA pattern: the root CA lives outside Vault (e.g. OpenSSL self-signed), and Vault manages
-only the intermediate CA. Enforces a bounded `max_lease_ttl`.
+and `vault_pki_secret_backend_config_urls` / `vault_pki_secret_backend_crl_config`. Implements
+the offline-root CA pattern: the root CA lives outside Vault (OpenSSL self-signed), and Vault
+manages only the intermediate CA. Signing the CSR and importing the signed certificate are
+performed via the `pki:int:sign` and `pki:int:import` CLI tasks (see §9), not by Terraform.
+Issuing roles are managed separately by `modules/pki-role`. Enforces a bounded `max_lease_ttl`.
 
 #### `modules/jwt-auth`
 
@@ -419,12 +420,13 @@ Inputs: `namespace` (folder), `vault_role`. Responsibilities:
      run: |
        curl -s --fail \
          --header "X-Vault-Token: ${{ env.VAULT_TOKEN }}" \
-         --header "X-Vault-Namespace: admin" \
+         --header "X-Vault-Namespace: ${{ inputs.vault_namespace }}" \
          --request POST \
          "${VAULT_ADDR}/v1/auth/token/revoke-self"
    ```
 
-   The `admin` namespace header is required because `jwt_github` is mounted in `admin`.
+   The namespace header must match the namespace the token was issued in (passed as
+   `inputs.vault_namespace` by the caller, e.g. `admin/tn001`).
    (Alternatively, `vault token revoke -self` if the `vault` CLI is on the runner.)
 
 ### Callers
@@ -489,14 +491,14 @@ Operational helpers for the offline-root CA workflow in `namespace-tn001/`:
 
 | Task | Description |
 |---|---|
-| `pki:root:generate` | Generate a self-signed root CA key and certificate with OpenSSL (`openssl req -newkey rsa:4096 -x509`) into `namespace-tn001/.pki/` |
+| `pki:root:generate` | Generate a self-signed root CA key and certificate with OpenSSL (`openssl req -newkey rsa:4096 -x509`) into `namespace-tn001/.tmp/` |
 | `pki:root:view` | Display root CA certificate details (`openssl x509 -noout -text`) |
-| `pki:int:csr` | Retrieve the intermediate CSR from the Vault mount and write it to `namespace-tn001/.pki/intermediate.csr` |
+| `pki:int:csr` | Retrieve the intermediate CSR from the Vault mount and write it to `namespace-tn001/.tmp/intermediate.csr` |
 | `pki:int:sign` | Sign the intermediate CSR with the offline root CA (`openssl x509 -req -CA`) and write `intermediate-signed.crt` |
 | `pki:int:verify` | Verify the certificate chain: intermediate against root |
 | `pki:int:import` | Import the signed intermediate certificate into Vault via the CLI (`vault write pki-int/intermediate/set-signed`) |
 
-> **Note:** `.pki/` is gitignored — private keys and signed certificates are never committed.
+> **Note:** `.tmp/` is gitignored — private keys and signed certificates are never committed.
 
 ### First-time end-to-end flow
 

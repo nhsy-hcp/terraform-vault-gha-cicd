@@ -2,8 +2,12 @@ pki_roles = {
   server = {
     allowed_domains  = ["example.com"]
     allow_subdomains = false
-    max_ttl          = "24h"
+    ttl              = "24h"
+    max_ttl          = "168h"
+    generate_lease   = false
+    no_store         = false
     key_type         = "ec"
     key_bits         = 256
+    issuer_ref       = "default"
   }
 }
