@@ -67,7 +67,7 @@ task bootstrap:apply                 # create HCP Terraform project/team/token/w
 
 task namespace-admin:init && task namespace-admin:lock
 eval "$(task namespace-admin:env)"   # set TF_VAR_vault_addr / TF_VAR_vault_token
-task namespace-admin:apply           # jwt_github auth, roles, policies
+# push to main — GHA namespace-admin.yml applies jwt_github auth, roles, policies
 ```
 
 On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
@@ -89,7 +89,6 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 | `task bootstrap:gh-config` | Set the `VAULT_ADDR` variable and `TFE_TOKEN` secret on the repo |
 | `task vault:ui` | Open the Vault UI in the browser |
 | `task namespace-admin:plan` | Preview admin-namespace changes |
-| `task namespace-admin:apply` | Apply admin-namespace config |
 | `task namespace-admin:env` | Print `TF_VAR_vault_addr` / `TF_VAR_vault_token` exports |
 | `task lint` | Run pre-commit checks |
 
@@ -117,7 +116,7 @@ task after each rotation to refresh the secret.
 1. Add `tn002` to `bootstrap/terraform.tfvars` (`vault_namespaces`) and
    `namespace-<tn002>` to `namespaces`, then `task bootstrap:apply`.
 2. Add `tn002` to `namespace-admin/terraform.tfvars` (`vault_namespaces`), then
-   `task namespace-admin:apply` — creates the `github-namespace-tn002` role and the
+   push to `main` — GHA `namespace-admin.yml` creates the `github-namespace-tn002` role and the
    `gha-namespace-admin` policy inside `admin/tn002`.
 3. Create the `namespace-tn002/` module with its scoped `vault` provider.
 4. Copy `.github/workflows/namespace-tn001.yml` → `namespace-tn002.yml`, adjusting the

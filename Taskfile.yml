@@ -179,12 +179,6 @@ tasks:
     cmds:
       - terraform plan
 
-  namespace-admin:apply:
-    desc: Apply the namespace-admin infrastructure (prompts for confirmation). Pass -- -auto-approve to skip prompt.
-    dir: "{{.NAMESPACE_ADMIN_DIR}}"
-    cmds:
-      - terraform apply {{.CLI_ARGS}}
-
   namespace-admin:destroy:
     desc: Destroy all namespace-admin-managed infrastructure (prompts for confirmation)
     dir: "{{.NAMESPACE_ADMIN_DIR}}"
@@ -244,12 +238,6 @@ tasks:
     dir: "{{.NAMESPACE_TN001_DIR}}"
     cmds:
       - terraform plan
-
-  namespace-tn001:apply:
-    desc: Apply the namespace-tn001 infrastructure. Pass -- -auto-approve to skip prompt.
-    dir: "{{.NAMESPACE_TN001_DIR}}"
-    cmds:
-      - terraform apply {{.CLI_ARGS}}
 
   namespace-tn001:destroy:
     desc: Destroy all namespace-tn001-managed infrastructure
