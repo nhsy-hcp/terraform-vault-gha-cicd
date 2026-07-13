@@ -22,8 +22,8 @@ CN="${CN:-helloworld.example.com}"
 TTL="${TTL:-1h}"
 NAMESPACE="${NAMESPACE:-admin/tn001}"
 PKI_MOUNT="${PKI_MOUNT:-pki-int}"
-ROOT_CA_CERT="${ROOT_CA_CERT:-.tmp/ca-chain.pem}"
-OUT_DIR="${OUT_DIR:-.tmp}"
+ROOT_CA_CERT="${ROOT_CA_CERT:-.tmp/pki/ca-chain.pem}"
+OUT_DIR="${OUT_DIR:-.tmp/pki}"
 
 mkdir -p "${OUT_DIR}"
 
