@@ -25,15 +25,16 @@ module "pki_roles" {
   source   = "../modules/pki-role"
   for_each = var.pki_roles
 
-  backend          = module.pki_intermediate.path
-  name             = each.key
-  issuer_ref       = each.value.issuer_ref
-  allowed_domains  = each.value.allowed_domains
-  allow_subdomains = each.value.allow_subdomains
-  ttl              = each.value.ttl
-  max_ttl          = each.value.max_ttl
-  generate_lease   = each.value.generate_lease
-  no_store         = each.value.no_store
-  key_type         = each.value.key_type
-  key_bits         = each.value.key_bits
+  backend            = module.pki_intermediate.path
+  name               = each.key
+  issuer_ref         = each.value.issuer_ref
+  allowed_domains    = each.value.allowed_domains
+  allow_bare_domains = each.value.allow_bare_domains
+  allow_subdomains   = each.value.allow_subdomains
+  ttl                = each.value.ttl
+  max_ttl            = each.value.max_ttl
+  generate_lease     = each.value.generate_lease
+  no_store           = each.value.no_store
+  key_type           = each.value.key_type
+  key_bits           = each.value.key_bits
 }

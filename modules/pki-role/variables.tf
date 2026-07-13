@@ -4,6 +4,12 @@ variable "allowed_domains" {
   default     = []
 }
 
+variable "allow_bare_domains" {
+  description = "Whether to allow the bare domains specified in allowed_domains."
+  type        = bool
+  default     = false
+}
+
 variable "allow_subdomains" {
   description = "Whether to allow subdomains of allowed_domains."
   type        = bool
