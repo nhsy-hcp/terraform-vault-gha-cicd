@@ -15,9 +15,9 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design.
 
 | Path | Purpose | State |
 |---|---|---|
-| `bootstrap/` | HCP HVN + Vault cluster + admin token, child namespaces, and HCP Terraform project/team/token + remote-state workspaces | Local |
-| `namespace-admin/` | Day-2 config for the `admin` namespace: `jwt_github` auth, roles, policies | HCP Terraform (`namespace-admin`) |
-| `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace (stub) | HCP Terraform (`namespace-tn001`) |
+| `bootstrap/` | HCP HVN + Vault cluster + admin token, child namespaces, and HCP Terraform project/team/token + remote-state workspaces | HCP Terraform (`bootstrap`, local execution) |
+| `namespace-admin/` | Day-2 config for the `admin` namespace: `jwt_github` auth, roles, policies | HCP Terraform (`namespace-admin`, local execution) |
+| `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace (stub) | HCP Terraform (`namespace-tn001`, local execution) |
 | `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
 | `policies/` | Reusable ACL policy HCL (`gha-namespace-admin.hcl`) | — |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows | — |
@@ -53,10 +53,12 @@ cp bootstrap/terraform.tfvars.example bootstrap/terraform.tfvars
 
 ## First-time end-to-end flow
 
-Because the `vault` provider cannot initialise until the cluster exists, a **new** cluster is
-provisioned in two passes:
+Because the `vault` provider cannot initialise until the cluster exists, and the HCP Terraform
+`bootstrap` workspace must exist before `terraform init` can run, the flow starts with a REST
+API call to create that workspace:
 
 ```sh
+task bootstrap:workspace:create      # create bootstrap workspace via REST API (chicken-and-egg)
 task bootstrap:init && task bootstrap:lock
 task bootstrap:apply:hcp             # create cluster (HCP + random resources only)
 eval "$(task bootstrap:env)"         # set VAULT_ADDR / VAULT_TOKEN
@@ -74,6 +76,7 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 
 | Command | Description |
 |---|---|
+| `task bootstrap:workspace:create` | Pre-init: create the `bootstrap` HCP Terraform workspace via REST API |
 | `task bootstrap:plan` | Preview bootstrap changes |
 | `task bootstrap:apply` | Apply bootstrap (interactive) |
 | `task bootstrap:apply:hcp` | First-time: create only the HCP cluster + random resources |

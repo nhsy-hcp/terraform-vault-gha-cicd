@@ -12,7 +12,8 @@ terraform {
     organization = "nhsy-hcp-org"
 
     workspaces {
-      name = "namespace-admin"
+      name    = "namespace-admin"
+      project = "terraform-vault-gha-cicd"
     }
   }
 }

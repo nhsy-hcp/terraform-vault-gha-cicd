@@ -37,6 +37,11 @@ tasks:
   # bootstrap namespace
   # ---------------------------------------------------------------------------
 
+  bootstrap:workspace:create:
+    desc: "Pre-init: create the bootstrap HCP Terraform workspace via REST API (chicken-and-egg)"
+    cmds:
+      - scripts/bootstrap-workspace-create.sh
+
   bootstrap:init:
     desc: Initialise Terraform providers and modules for the bootstrap module
     dir: "{{.BOOTSTRAP_DIR}}"

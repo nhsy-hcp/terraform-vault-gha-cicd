@@ -1,4 +1,13 @@
 terraform {
+  cloud {
+    organization = "nhsy-hcp-org"
+
+    workspaces {
+      name    = "bootstrap"
+      project = "terraform-vault-gha-cicd"
+    }
+  }
+
   required_providers {
     hcp = {
       source  = "hashicorp/hcp"
