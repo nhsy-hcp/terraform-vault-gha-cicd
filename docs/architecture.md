@@ -498,7 +498,8 @@ modules first run. Onboarding a new tenant therefore adds one more
 
 Local development is driven by `Taskfile.yml`. Representative tasks:
 
-- `deps`, `lint` — dependency checks and `pre-commit` (gitleaks, terraform fmt/tflint).
+- `deps`, `lint` — dependency checks and `pre-commit` (gitleaks, terraform fmt, tflint, terraform-docs).
+- `test:ci`, `test:lint` — run GHA workflows locally via `act`.
 - `bootstrap:{init,lock,plan,apply,apply:hcp,apply:vault,destroy,output,env,clean}`.
 - `namespace-admin:{init,lock,validate,fmt,plan,apply,destroy,output,env,clean}`.
 - `namespace-tn001:{init,lock,validate,fmt,plan,apply,destroy,output,clean}`.

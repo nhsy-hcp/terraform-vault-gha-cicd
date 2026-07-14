@@ -108,6 +108,8 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 | `task pki:int:chain` | Fetch intermediate CA cert and build `.tmp/pki/ca-chain.pem` |
 | `task pki:int:regen` | Taint + re-apply cert request, re-sign, import (recovery) |
 | `task lint` | Run pre-commit checks |
+| `task test:ci` | Run all GHA workflows locally with act (lint + namespace dry-runs) |
+| `task test:lint` | Run lint GHA workflow locally with act |
 
 Run `task --list` for the full task set.
 

@@ -69,8 +69,8 @@ imported back into Vault.
        allowed_domains    = ["example.com"]
        allow_bare_domains = true
        allow_subdomains   = false
-       ttl                = "24h"
-       max_ttl            = "168h"
+      ttl                = "86400"
+        max_ttl            = "604800"
        generate_lease     = false
        no_store           = false
        key_type           = "ec"

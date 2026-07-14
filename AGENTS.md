@@ -55,6 +55,9 @@ task pki:int:set-issuer          # set default issuer and link key after set-sig
 task pki:int:chain               # fetch intermediate CA cert and build .tmp/pki/ca-chain.pem
 task pki:int:regen               # taint + re-apply cert request, re-sign, import (recovery)
 
+task test:ci                     # run all GHA workflows locally with act (lint + namespace dry-runs)
+task test:lint                   # run lint GHA workflow locally with act
+
 task vault:ui                    # open Vault UI in browser
 ```
 
