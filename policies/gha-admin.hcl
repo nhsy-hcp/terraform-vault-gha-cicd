@@ -50,6 +50,10 @@ path "+/sys/auth/*" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
+path "+/sys/mounts/auth/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
 path "+/auth/jwt_github" {
   capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
