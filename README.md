@@ -25,20 +25,27 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design.
 ## Prerequisites
 
 - [Terraform](https://developer.hashicorp.com/terraform/install)
+
   ```sh
   brew tap hashicorp/tap
   brew install hashicorp/tap/terraform
   ```
+
 - [Task](https://taskfile.dev/installation/)
+
   ```sh
   brew install go-task
   ```
+
 - [HCP CLI](https://developer.hashicorp.com/hcp/docs/cli) authenticated (`hcp auth login`)
+
   ```sh
   brew install hashicorp/tap/hcp
   hcp auth login && hcp profile init
   ```
+
 - [Vault CLI](https://developer.hashicorp.com/vault/install)
+
   ```sh
   brew install hashicorp/tap/vault
   ```

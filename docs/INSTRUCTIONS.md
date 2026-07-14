@@ -13,10 +13,12 @@ imported back into Vault.
 - `VAULT_ADDR` and `VAULT_TOKEN` set with rights in the `admin/tn001` namespace.
   Run `eval "$(task bootstrap:env)"` to export both from the bootstrap state, or
   set them manually:
+
   ```sh
   export VAULT_ADDR=$(task bootstrap:vault-addr)
   export VAULT_TOKEN=$(task bootstrap:vault-token)   # also copies to clipboard
   ```
+
 - `terraform`, `vault`, `openssl`, and `jq` available on your `PATH`.
 
 ### Steps

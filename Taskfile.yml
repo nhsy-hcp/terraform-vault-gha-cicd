@@ -12,8 +12,23 @@ tasks:
   # ---------------------------------------------------------------------------
 
   lint:
-    desc: Run all code quality and formatting checks
-    cmd: pre-commit run -a
+    desc: Run all code quality and formatting checks (includes terraform-docs and markdown lint)
+    cmds:
+      - task: terraform-docs
+      - pre-commit run -a
+
+  terraform-docs:
+    desc: Generate terraform-docs README.md for all modules under modules/
+    cmds:
+      - |
+        for mod in modules/*/; do
+          terraform-docs --config .terraform-docs.yml "$mod"
+        done
+
+  markdown-lint:
+    desc: Lint all Markdown files (excludes .plans/ and .tmp/)
+    cmds:
+      - npx markdownlint-cli --config .markdownlint.yml --ignore '.plans/' --ignore '.tmp/' '**/*.md'
 
   deps:
     desc: Check required dependencies are installed

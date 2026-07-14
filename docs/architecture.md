@@ -26,7 +26,7 @@ authentication and per-namespace role/policy provisioning, while each tenant nam
 
 ## 2. High-Level Architecture
 
-```
+```text
 ┌──────────────────────────────────────────────────────────────────────────┐
 │ GitHub Actions (OIDC provider)                                             │
 │                                                                            │
@@ -374,6 +374,7 @@ rejected.
 Three policies express the privilege model. Each grants only what its consumer needs.
 
 ### `self-token-admin`
+
 Allows a token to manage its own lifecycle only:
 
 - `auth/token/lookup-self` → read
@@ -381,6 +382,7 @@ Allows a token to manage its own lifecycle only:
 - `auth/token/revoke-self` → update
 
 ### `github-admin` (admin tasks only)
+
 Exactly what `namespace-admin/` Terraform requires — namespace management, ACL policy
 management, and JWT auth config/roles:
 
@@ -389,6 +391,7 @@ management, and JWT auth config/roles:
 - `auth/jwt/config`, `auth/jwt/role`, `auth/jwt/role/*`
 
 ### `gha-namespace-admin` (universal, per-namespace)
+
 A single reusable policy (`policies/gha-namespace-admin.hcl`) granting the broad set of
 capabilities a namespace admin needs — auth backends, identity, policies, mounts, quotas.
 
@@ -400,7 +403,7 @@ needed.
 
 ### Isolation model
 
-```
+```text
 admin namespace
   ├─ github-admin        → can manage namespaces, JWT, policies (admin scope)
   └─ per-namespace role  → token scoped to admin/<name>, holds gha-namespace-admin
@@ -455,6 +458,7 @@ Each caller `uses:` the reusable workflow with `secrets: inherit`.
 ### Required GitHub repository configuration
 
 Variables (GitHub Actions environment variables):
+
 - `VAULT_ADDR` — public endpoint URL (`task bootstrap:output`)
 - `TFE_TOKEN` — HCP Terraform API token for the `cloud {}` backend
 
@@ -499,7 +503,7 @@ Local development is driven by `Taskfile.yml`. Representative tasks:
 - `namespace-admin:{init,lock,validate,fmt,plan,apply,destroy,output,env,clean}`.
 - `namespace-tn001:{init,lock,validate,fmt,plan,apply,destroy,output,clean}`.
 
-#### PKI tasks (`pki:*`)
+### PKI tasks (`pki:*`)
 
 Operational helpers for the offline-root CA workflow in `namespace-tn001/`:
 

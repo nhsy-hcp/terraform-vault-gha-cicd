@@ -1,4 +1,16 @@
 repos:
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.49.0
+    hooks:
+      - id: markdownlint
+        args:
+          - --config
+          - .markdownlint.yml
+          - --ignore
+          - .plans/
+          - --ignore
+          - .tmp/
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:
@@ -24,3 +36,10 @@ repos:
         args:
           - --args=--init
           - --args=--minimum-failure-severity=warning
+      - id: terraform_docs
+        args:
+          - --hook-config=--path-to-file=README.md
+          - --hook-config=--add-to-existing-file=true
+          - --hook-config=--create-file-if-not-exist=true
+          - --args=--config=.terraform-docs.yml
+        files: ^modules/

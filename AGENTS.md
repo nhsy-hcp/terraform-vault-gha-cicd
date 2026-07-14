@@ -81,6 +81,7 @@ Workflows use keyless OIDC auth: GitHub OIDC token → scoped Vault token via `h
 - Job names: `lint` → `deploy` (not `apply`)
 
 Required repo config:
+
 - **Variable** `VAULT_ADDR` — set via `task bootstrap:gh-config`
 - **Secret** `TFE_TOKEN` — set via `task bootstrap:gh-config`
 
@@ -96,6 +97,7 @@ All workspaces use HCP Terraform for remote state (`execution_mode = "local"`). 
 ## PKI Module Notes
 
 When adding new fields to the `pki-role` module:
+
 1. Add variable to `modules/pki-role/variables.tf`
 2. Wire it in `modules/pki-role/main.tf`
 3. Add `optional(...)` attribute to `variable "pki_roles"` in `namespace-tn001/variables.tf`
