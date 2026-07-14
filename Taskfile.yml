@@ -41,12 +41,21 @@ tasks:
       - echo "All dependencies satisfied"
 
   test:ci:
-    desc: Validate the GitHub Actions workflows locally with act (validate + dry-run, no execution)
+    desc: Validate and run all GitHub Actions workflows locally with act
     cmds:
       - 'command -v act >/dev/null 2>&1 || (echo "act not found - see https://github.com/nektos/act" && exit 1)'
       - act --validate
+      - 'act -j pre-commit --container-architecture {{.ACT_ARCH}} -W .github/workflows/lint.yml'
       - 'act pull_request --dryrun --container-architecture {{.ACT_ARCH}} -W .github/workflows/namespace-admin.yml'
       - 'act pull_request --dryrun --container-architecture {{.ACT_ARCH}} -W .github/workflows/namespace-tn001.yml'
+      - 'act -j lint --container-architecture {{.ACT_ARCH}} -W .github/workflows/namespace-admin.yml'
+      - 'act -j lint --container-architecture {{.ACT_ARCH}} -W .github/workflows/namespace-tn001.yml'
+
+  test:lint:
+    desc: Run the lint GitHub Actions workflow locally with act
+    cmds:
+      - 'command -v act >/dev/null 2>&1 || (echo "act not found - see https://github.com/nektos/act" && exit 1)'
+      - 'act -j pre-commit --container-architecture {{.ACT_ARCH}} -W .github/workflows/lint.yml'
 
   # ---------------------------------------------------------------------------
   # bootstrap namespace
