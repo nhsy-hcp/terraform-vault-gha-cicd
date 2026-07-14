@@ -69,6 +69,18 @@ variable "ocsp_expiry" {
   default     = "12h"
 }
 
+variable "enable_templating" {
+  description = "Allow AIA URL templating (e.g. {{cluster_path}}, {{issuer_id}})."
+  type        = bool
+  default     = false
+}
+
+variable "ocsp_servers" {
+  description = "List of URLs to be used as OCSP server endpoints in issued certificates."
+  type        = list(string)
+  default     = []
+}
+
 variable "path" {
   description = "Mount path for the intermediate PKI secrets engine."
   type        = string

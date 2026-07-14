@@ -19,6 +19,11 @@ module "pki_intermediate" {
   path        = "pki-int"
   description = "PKI intermediate CA for tn001"
   common_name = "tn001 Intermediate CA"
+
+  enable_templating       = true
+  issuing_certificates    = ["{{cluster_path}}/issuer/{{issuer_id}}/der"]
+  crl_distribution_points = ["{{cluster_path}}/issuer/{{issuer_id}}/crl/der"]
+  ocsp_servers            = ["{{cluster_path}}/ocsp"]
 }
 
 module "pki_roles" {

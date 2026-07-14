@@ -8,8 +8,9 @@ Before running any Terraform or Vault commands, export the required environment 
 
 ```sh
 eval "$(task bootstrap:env)"        # sets VAULT_ADDR and VAULT_TOKEN
-eval "$(task namespace-admin:env)"  # sets TF_VAR_vault_addr and TF_VAR_vault_token
 ```
+
+`task namespace-admin:plan` and `task namespace-tn001:plan` automatically run `bootstrap:env` internally — no manual export needed before these tasks.
 
 ## Repository Layout
 

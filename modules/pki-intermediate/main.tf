@@ -15,11 +15,13 @@ resource "vault_pki_secret_backend_intermediate_cert_request" "this" {
 }
 
 resource "vault_pki_secret_backend_config_urls" "this" {
-  count   = length(var.issuing_certificates) > 0 || length(var.crl_distribution_points) > 0 ? 1 : 0
+  count   = length(var.issuing_certificates) > 0 || length(var.crl_distribution_points) > 0 || length(var.ocsp_servers) > 0 ? 1 : 0
   backend = vault_mount.this.path
 
   issuing_certificates    = var.issuing_certificates
   crl_distribution_points = var.crl_distribution_points
+  ocsp_servers            = var.ocsp_servers
+  enable_templating       = var.enable_templating
 
   depends_on = [vault_pki_secret_backend_intermediate_cert_request.this]
 }

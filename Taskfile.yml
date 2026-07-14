@@ -155,12 +155,6 @@ tasks:
     cmds:
       - terraform init -upgrade
 
-  namespace-admin:lock:
-    desc: Generate provider lock for multiple platforms
-    dir: "{{.NAMESPACE_ADMIN_DIR}}"
-    cmds:
-      - terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=darwin_amd64
-
   namespace-admin:validate:
     desc: Validate the namespace-admin Terraform configuration
     dir: "{{.NAMESPACE_ADMIN_DIR}}"
@@ -177,7 +171,9 @@ tasks:
     desc: Generate and display a Terraform execution plan for namespace-admin
     dir: "{{.NAMESPACE_ADMIN_DIR}}"
     cmds:
-      - terraform plan
+      - |
+        eval "$(task bootstrap:env)"
+        terraform plan
 
   namespace-admin:destroy:
     desc: Destroy all namespace-admin-managed infrastructure (prompts for confirmation)
@@ -185,41 +181,11 @@ tasks:
     cmds:
       - terraform destroy
 
-  namespace-admin:output:
-    desc: Display all outputs from the namespace-admin state
-    dir: "{{.NAMESPACE_ADMIN_DIR}}"
-    cmds:
-      - terraform output
-
-  namespace-admin:env:
-    desc: Print eval command to set TF_VAR_vault_addr and TF_VAR_vault_token from VAULT_ADDR/VAULT_TOKEN
-    dir: "{{.NAMESPACE_ADMIN_DIR}}"
-    silent: true
-    cmds:
-      - echo "export TF_VAR_vault_addr=$VAULT_ADDR"
-      - echo "export TF_VAR_vault_token=$VAULT_TOKEN"
-
-  namespace-admin:clean:
-    desc: Remove local Terraform cache for namespace-admin
-    dir: "{{.NAMESPACE_ADMIN_DIR}}"
-    cmds:
-      - rm -rf .terraform .terraform.lock.hcl
-
-  # ---------------------------------------------------------------------------
-  # namespace-tn001 namespace
-  # ---------------------------------------------------------------------------
-
   namespace-tn001:init:
     desc: Initialise Terraform providers and modules for namespace-tn001
     dir: "{{.NAMESPACE_TN001_DIR}}"
     cmds:
       - terraform init -upgrade
-
-  namespace-tn001:lock:
-    desc: Generate provider lock for multiple platforms
-    dir: "{{.NAMESPACE_TN001_DIR}}"
-    cmds:
-      - terraform providers lock -platform=linux_amd64 -platform=darwin_arm64 -platform=darwin_amd64
 
   namespace-tn001:validate:
     desc: Validate the namespace-tn001 Terraform configuration
@@ -237,25 +203,15 @@ tasks:
     desc: Generate and display a Terraform execution plan for namespace-tn001
     dir: "{{.NAMESPACE_TN001_DIR}}"
     cmds:
-      - terraform plan
+      - |
+        eval "$(task bootstrap:env)"
+        terraform plan
 
   namespace-tn001:destroy:
     desc: Destroy all namespace-tn001-managed infrastructure
     dir: "{{.NAMESPACE_TN001_DIR}}"
     cmds:
       - terraform destroy
-
-  namespace-tn001:output:
-    desc: Display all outputs from the namespace-tn001 state
-    dir: "{{.NAMESPACE_TN001_DIR}}"
-    cmds:
-      - terraform output
-
-  namespace-tn001:clean:
-    desc: Remove local Terraform cache for namespace-tn001
-    dir: "{{.NAMESPACE_TN001_DIR}}"
-    cmds:
-      - rm -rf .terraform .terraform.lock.hcl
 
   # ---------------------------------------------------------------------------
   # PKI offline-root CA tasks (namespace-tn001)

@@ -17,6 +17,8 @@ repos:
       - id: terraform_fmt
         args:
           - --args=-recursive
+      - id: terraform_validate
+        files: ^(bootstrap|namespace-admin|namespace-tn001)/.*\.tf$
       - id: terraform_tflint
         files: ^(bootstrap|namespace-admin|namespace-tn001)/.*\.tf$
         args:
