@@ -10,7 +10,10 @@ Before running any Terraform or Vault commands, export the required environment 
 eval "$(task bootstrap:env)"        # sets VAULT_ADDR and VAULT_TOKEN
 ```
 
-`task namespace-admin:plan` and `task namespace-tn001:plan` automatically run `bootstrap:env` internally — no manual export needed before these tasks.
+This must be run in the current shell before invoking any `terraform` or `vault` CLI
+commands directly. The task wrappers (`task namespace-admin:plan`,
+`task namespace-tn001:plan`, etc.) call `bootstrap:env` internally, so the explicit
+`eval` step is only required when running commands outside of `task`.
 
 ## Repository Layout
 
