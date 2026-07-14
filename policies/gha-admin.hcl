@@ -31,3 +31,29 @@ path "auth/jwt/role" {
 path "auth/jwt/role/*" {
   capabilities = ["create", "read", "update", "delete", "list"]
 }
+
+# Allow managing ACL policies inside child namespaces (e.g. admin/tn001)
+path "+/sys/policies/acl" {
+  capabilities = ["list"]
+}
+
+path "+/sys/policies/acl/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
+}
+
+# Allow enabling and configuring auth methods inside child namespaces
+path "+/sys/auth" {
+  capabilities = ["read", "list"]
+}
+
+path "+/sys/auth/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
+path "+/auth/jwt_github" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
+
+path "+/auth/jwt_github/*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
+}
