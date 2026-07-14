@@ -5,7 +5,7 @@ pki_roles = {
     allowed_domains    = ["helloworld.example.com"]
     allow_bare_domains = true
     allow_subdomains   = false
-    max_ttl            = "24h"
+    max_ttl            = "86400"
     key_type           = "ec"
     key_bits           = 256
   }
