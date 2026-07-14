@@ -100,6 +100,10 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 | `task pki:test` | Run both PKI issue and sign endpoint tests |
 | `task pki:test:issue` | Test PKI issue endpoint (Vault generates key + cert) |
 | `task pki:test:sign` | Test PKI sign endpoint (local CSR signed by Vault) |
+| `task pki:test:issue:inspect` | Issue a cert and inspect AIA, CRL, OCSP extensions with openssl |
+| `task pki:read` | Read pki-int configuration (urls, crl, cluster, issuers, roles) |
+| `task pki:int:cert` | Fetch intermediate CA cert from Vault and display with openssl x509 |
+| `task pki:int:crl` | Fetch CRL from Vault and display with openssl crl |
 | `task pki:int:csr` | Retrieve intermediate CSR from Terraform state |
 | `task pki:int:sign` | Sign intermediate CSR with offline root CA |
 | `task pki:int:verify` | Verify signed cert against root CA |

@@ -321,6 +321,16 @@ tasks:
       - cat .tmp/pki/root-ca.crt .tmp/pki/intermediate-ca.pem > .tmp/pki/ca-chain.pem
       - echo "CA chain written to .tmp/pki/ca-chain.pem"
 
+  pki:int:cert:
+    desc: Fetch the intermediate CA cert from Vault and display with openssl x509
+    cmds:
+      - mkdir -p .tmp/pki
+      - |
+        eval "$(task bootstrap:env)"
+        vault read -namespace=admin/tn001 -format=json pki-int/cert/ca \
+          | jq -r '.data.certificate' | tee .tmp/pki/intermediate-ca.pem \
+          | openssl x509 -noout -text
+
   pki:test:issue:
     desc: Test the PKI issue endpoint — Vault generates key and certificate for the server role
     vars:
@@ -333,6 +343,21 @@ tasks:
       TTL: "{{.TTL}}"
     cmds:
       - VAULT_ADDR="$VAULT_ADDR" VAULT_TOKEN="$VAULT_TOKEN" scripts/pki-test-issue.sh
+
+  pki:test:issue:inspect:
+    desc: Issue a certificate and inspect AIA, CRL, and OCSP extensions with openssl
+    vars:
+      ROLE: '{{.ROLE | default "server"}}'
+      CN: '{{.CN | default "helloworld.example.com"}}'
+      TTL: '{{.TTL | default "1h"}}'
+    cmds:
+      - |
+        eval "$(task bootstrap:env)"
+        vault write -namespace=admin/tn001 -format=json pki-int/issue/{{.ROLE}} \
+          common_name={{.CN}} ttl={{.TTL}} \
+          | jq -r '.data.certificate' \
+          | openssl x509 -noout -text \
+          | grep -A5 "Authority Information\|CRL Distribution"
 
   pki:test:sign:
     desc: Test the PKI sign endpoint — generate a local CSR and have Vault sign it for the server role
@@ -352,3 +377,23 @@ tasks:
     cmds:
       - task: pki:test:issue
       - task: pki:test:sign
+
+  pki:read:
+    desc: Read pki-int configuration (urls, crl, cluster, issuers, roles)
+    cmds:
+      - |
+        eval "$(task bootstrap:env)"
+        vault read -namespace=admin/tn001 pki-int/config/urls
+        vault read -namespace=admin/tn001 pki-int/config/crl
+        vault read -namespace=admin/tn001 pki-int/config/cluster
+        vault list -namespace=admin/tn001 pki-int/issuers
+        vault list -namespace=admin/tn001 pki-int/roles
+
+  pki:int:crl:
+    desc: Fetch the CRL from Vault and display with openssl crl
+    cmds:
+      - |
+        eval "$(task bootstrap:env)"
+        vault read -namespace=admin/tn001 -format=json pki-int/cert/crl \
+          | jq -r '.data.certificate' \
+          | openssl crl -noout -text -inform PEM

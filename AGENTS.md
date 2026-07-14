@@ -47,6 +47,10 @@ task namespace-tn001:init        # initialise Terraform for namespace-tn001
 task pki:test                    # run both PKI issue and sign endpoint tests
 task pki:test:issue              # test PKI issue endpoint (Vault generates key + cert)
 task pki:test:sign               # test PKI sign endpoint (local CSR signed by Vault)
+task pki:test:issue:inspect      # issue a cert and inspect AIA, CRL, OCSP extensions with openssl
+task pki:read                    # read pki-int configuration (urls, crl, cluster, issuers, roles)
+task pki:int:cert                # fetch intermediate CA cert from Vault and display with openssl x509
+task pki:int:crl                 # fetch CRL from Vault and display with openssl crl
 task pki:int:csr                 # retrieve intermediate CSR from Terraform state
 task pki:int:sign                # sign intermediate CSR with offline root CA
 task pki:int:verify              # verify signed cert against root CA
