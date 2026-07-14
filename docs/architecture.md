@@ -103,7 +103,7 @@ target namespace), and exposes sensible defaults.
 | Module | Purpose | Key inputs | Key outputs |
 |---|---|---|---|
 | `modules/kv-engine` | Mount a KV v2 secrets engine | `path`, `description`, `max_versions`, `cas_required`, `delete_version_after` | `path`, `accessor` |
-| `modules/pki-intermediate` | Mount a PKI intermediate CA and configure CRL/OCSP (offline-root pattern; signing and import performed via CLI tasks) | `path`, `description`, `common_name`, `key_type`, `key_bits`, `default_lease_ttl`, `max_lease_ttl`, `issuing_certificates`, `crl_distribution_points`, `crl_expiry`, `crl_disable`, `ocsp_enable`, `ocsp_expiry` | `path`, `accessor`, `csr` |
+| `modules/pki-intermediate` | Mount a PKI intermediate CA and configure CRL/OCSP (offline-root pattern; signing and import performed via CLI tasks) | `path`, `description`, `common_name`, `key_type`, `key_bits`, `default_lease_ttl`, `max_lease_ttl`, `cluster_path`, `enable_templating`, `issuing_certificates`, `crl_distribution_points`, `crl_expiry`, `crl_disable`, `ocsp_enable`, `ocsp_expiry` | `path`, `accessor`, `csr` |
 | `modules/jwt-auth` | Mount a JWT/OIDC auth method and create bound-claim roles | `path`, `oidc_discovery_url` / `bound_issuer`, `default_lease_ttl`, `max_lease_ttl`, `roles` (`user_claim`, `bound_claims`, `token_policies`, TTLs) | `path`, `accessor`, `role_names` |
 | `modules/hcp-tf-workspace` | Provision a remote-state-only HCP Terraform workspace (`execution_mode = "local"`) | `name`, `organization`, `project_id`, `tags`, `terraform_version` | `workspace_id`, `workspace_name` |
 | `modules/acl-policy` | DRY creation of Vault ACL policies from HCL templates | `name`, `policy` (HCL string) | `name` |
@@ -117,11 +117,18 @@ application secrets. Defaults to `max_versions = 10` and optional check-and-set.
 #### `modules/pki-intermediate`
 
 Wraps `vault_mount` (type `pki`), `vault_pki_secret_backend_intermediate_cert_request`,
-and `vault_pki_secret_backend_config_urls` / `vault_pki_secret_backend_crl_config`. Implements
-the offline-root CA pattern: the root CA lives outside Vault (OpenSSL self-signed), and Vault
-manages only the intermediate CA. Signing the CSR and importing the signed certificate are
-performed via the `pki:int:sign` and `pki:int:import` CLI tasks (see §9), not by Terraform.
-Issuing roles are managed separately by `modules/pki-role`. Enforces a bounded `max_lease_ttl`.
+`vault_pki_secret_backend_config_cluster`, and `vault_pki_secret_backend_config_urls` /
+`vault_pki_secret_backend_crl_config`. Implements the offline-root CA pattern: the root CA
+lives outside Vault (OpenSSL self-signed), and Vault manages only the intermediate CA.
+Signing the CSR and importing the signed certificate are performed via the `pki:int:sign`
+and `pki:int:import` CLI tasks (see §9), not by Terraform. Setting the default issuer after
+import is handled by `pki:int:set-issuer` (called automatically by `pki:int:import`).
+Issuing roles are managed separately by `modules/pki-role`. Enforces a bounded
+`max_lease_ttl`.
+
+The `cluster_path` variable must be set when `enable_templating = true` so Vault can
+resolve `{{cluster_path}}` in AIA/CRL/OCSP URL templates. In `namespace-tn001` this is
+derived from `var.vault_address` in `terraform.auto.tfvars`.
 
 #### `modules/jwt-auth`
 

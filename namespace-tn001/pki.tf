@@ -20,6 +20,7 @@ module "pki_intermediate" {
   description = "PKI intermediate CA for tn001"
   common_name = "tn001 Intermediate CA"
 
+  cluster_path            = var.vault_address != "" ? "${var.vault_address}/v1/admin/tn001/pki-int" : ""
   enable_templating       = true
   issuing_certificates    = ["{{cluster_path}}/issuer/{{issuer_id}}/der"]
   crl_distribution_points = ["{{cluster_path}}/issuer/{{issuer_id}}/crl/der"]

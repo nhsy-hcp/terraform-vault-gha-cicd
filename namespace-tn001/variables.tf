@@ -1,3 +1,9 @@
+variable "vault_address" {
+  description = "Vault cluster public address used to build PKI AIA/cluster URLs (e.g. https://vault.example.com:8200). Set via TF_VAR_vault_address or VAULT_ADDR."
+  type        = string
+  default     = ""
+}
+
 variable "pki_roles" {
   description = "Map of PKI roles to create under the tn001 intermediate CA."
   type = map(object({

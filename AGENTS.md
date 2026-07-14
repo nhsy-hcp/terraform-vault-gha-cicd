@@ -47,7 +47,13 @@ task namespace-tn001:init        # initialise Terraform for namespace-tn001
 task pki:test                    # run both PKI issue and sign endpoint tests
 task pki:test:issue              # test PKI issue endpoint (Vault generates key + cert)
 task pki:test:sign               # test PKI sign endpoint (local CSR signed by Vault)
-task pki:int:chain               # fetch intermediate CA cert and build .tmp/ca-chain.pem
+task pki:int:csr                 # retrieve intermediate CSR from Terraform state
+task pki:int:sign                # sign intermediate CSR with offline root CA
+task pki:int:verify              # verify signed cert against root CA
+task pki:int:import              # import signed cert into Vault (calls set-issuer + chain)
+task pki:int:set-issuer          # set default issuer and link key after set-signed
+task pki:int:chain               # fetch intermediate CA cert and build .tmp/pki/ca-chain.pem
+task pki:int:regen               # taint + re-apply cert request, re-sign, import (recovery)
 
 task vault:ui                    # open Vault UI in browser
 ```
@@ -96,6 +102,15 @@ When adding new fields to the `pki-role` module:
 4. Pass it through in `namespace-tn001/pki.tf`
 
 Test after apply with `task pki:test`.
+
+The `pki-intermediate` module requires `cluster_path` to be set when `enable_templating = true`
+(needed for AIA/CRL URL resolution). This is wired via `var.vault_address` in
+`namespace-tn001/terraform.auto.tfvars` — update it if the cluster endpoint changes.
+
+After `pki:int:import`, `pki:int:set-issuer` is called automatically to set the default issuer
+and link the Terraform-managed key. If the `pki-int` mount is ever recreated (e.g. during
+a taint/re-apply), run `task pki:int:regen` to regenerate the CSR, re-sign, re-import, and
+restore the default issuer in one step.
 
 ## Temporary Files
 

@@ -14,6 +14,15 @@ resource "vault_pki_secret_backend_intermediate_cert_request" "default" {
   key_bits    = var.key_bits
 }
 
+resource "vault_pki_secret_backend_config_cluster" "default" {
+  count    = var.cluster_path != "" ? 1 : 0
+  backend  = vault_mount.default.path
+  path     = var.cluster_path
+  aia_path = var.cluster_aia_path != "" ? var.cluster_aia_path : var.cluster_path
+
+  depends_on = [vault_pki_secret_backend_intermediate_cert_request.default]
+}
+
 resource "vault_pki_secret_backend_config_urls" "default" {
   count   = length(var.issuing_certificates) > 0 || length(var.crl_distribution_points) > 0 || length(var.ocsp_servers) > 0 ? 1 : 0
   backend = vault_mount.default.path
@@ -23,7 +32,7 @@ resource "vault_pki_secret_backend_config_urls" "default" {
   ocsp_servers            = var.ocsp_servers
   enable_templating       = var.enable_templating
 
-  depends_on = [vault_pki_secret_backend_intermediate_cert_request.default]
+  depends_on = [vault_pki_secret_backend_intermediate_cert_request.default, vault_pki_secret_backend_config_cluster.default]
 }
 
 resource "vault_pki_secret_backend_crl_config" "default" {

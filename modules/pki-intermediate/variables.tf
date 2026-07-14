@@ -86,3 +86,15 @@ variable "path" {
   type        = string
   default     = "pki-int"
 }
+
+variable "cluster_path" {
+  description = "Vault cluster API path for AIA URL templating (e.g. https://vault.example.com:8200/v1/admin/tn001/pki-int). Required when enable_templating=true."
+  type        = string
+  default     = ""
+}
+
+variable "cluster_aia_path" {
+  description = "Vault cluster AIA path for AIA URL templating. Defaults to cluster_path if empty."
+  type        = string
+  default     = ""
+}

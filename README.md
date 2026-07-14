@@ -93,6 +93,13 @@ On day-2 (cluster already exists) a single `task bootstrap:apply` is sufficient.
 | `task pki:test` | Run both PKI issue and sign endpoint tests |
 | `task pki:test:issue` | Test PKI issue endpoint (Vault generates key + cert) |
 | `task pki:test:sign` | Test PKI sign endpoint (local CSR signed by Vault) |
+| `task pki:int:csr` | Retrieve intermediate CSR from Terraform state |
+| `task pki:int:sign` | Sign intermediate CSR with offline root CA |
+| `task pki:int:verify` | Verify signed cert against root CA |
+| `task pki:int:import` | Import signed cert into Vault (calls `set-issuer` + `chain`) |
+| `task pki:int:set-issuer` | Set default issuer and link Terraform-managed key |
+| `task pki:int:chain` | Fetch intermediate CA cert and build `.tmp/pki/ca-chain.pem` |
+| `task pki:int:regen` | Taint + re-apply cert request, re-sign, import (recovery) |
 | `task lint` | Run pre-commit checks |
 
 Run `task --list` for the full task set.

@@ -260,9 +260,31 @@ tasks:
         vault write \
           -namespace=admin/tn001 \
           pki-int/intermediate/set-signed \
-          certificate=@.tmp/pki/intermediate-signed.crt
+          certificate=@.tmp/pki/intermediate-signed.crt || true
       - echo "Intermediate certificate imported into Vault"
+      - task: pki:int:set-issuer
       - task: pki:int:chain
+
+  pki:int:set-issuer:
+    desc: Set the imported intermediate issuer as the default and link it to the Terraform-managed key
+    cmds:
+      - scripts/pki-int-set-issuer.sh
+
+  pki:int:regen:
+    desc: Taint the intermediate cert request, re-apply, re-sign, import, and set the default issuer
+    cmds:
+      - |
+        eval "$(task bootstrap:env)"
+        terraform -chdir={{.NAMESPACE_TN001_DIR}} taint \
+          module.pki_intermediate.vault_pki_secret_backend_intermediate_cert_request.default
+      - |
+        eval "$(task bootstrap:env)"
+        terraform -chdir={{.NAMESPACE_TN001_DIR}} apply -auto-approve \
+          -target=module.pki_intermediate.vault_pki_secret_backend_intermediate_cert_request.default
+      - task: pki:int:csr
+      - task: pki:int:sign
+      - task: pki:int:verify
+      - task: pki:int:import
 
   pki:int:chain:
     desc: Fetch the intermediate CA cert from Vault and build .tmp/pki/ca-chain.pem (root + intermediate)
