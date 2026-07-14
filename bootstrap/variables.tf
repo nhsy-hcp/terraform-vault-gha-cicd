@@ -73,12 +73,6 @@ variable "public_endpoint" {
   default     = true
 }
 
-variable "vault_namespaces" {
-  description = "List of child namespace paths to create under admin"
-  type        = list(string)
-  default     = []
-}
-
 variable "vault_auth_mount_path" {
   description = "Mount path for the GitHub OIDC JWT auth method"
   type        = string

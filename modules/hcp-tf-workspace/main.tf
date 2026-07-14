@@ -1,4 +1,4 @@
-resource "tfe_workspace" "this" {
+resource "tfe_workspace" "default" {
   name              = var.name
   organization      = var.organization
   project_id        = var.project_id != "" ? var.project_id : null
@@ -9,7 +9,7 @@ resource "tfe_workspace" "this" {
 # Remote-state-only: Terraform runs happen in GitHub Actions, not in HCP
 # Terraform. execution_mode = "local" uses the workspace purely to store and
 # lock state. Managed via tfe_workspace_settings (the non-deprecated path).
-resource "tfe_workspace_settings" "this" {
-  workspace_id   = tfe_workspace.this.id
+resource "tfe_workspace_settings" "default" {
+  workspace_id   = tfe_workspace.default.id
   execution_mode = "local"
 }

@@ -1,4 +1,4 @@
-resource "vault_jwt_auth_backend" "this" {
+resource "vault_jwt_auth_backend" "default" {
   namespace          = var.namespace != "" ? var.namespace : null
   path               = var.path
   description        = var.description
@@ -12,11 +12,11 @@ resource "vault_jwt_auth_backend" "this" {
   }
 }
 
-resource "vault_jwt_auth_backend_role" "this" {
+resource "vault_jwt_auth_backend_role" "default" {
   for_each = var.roles
 
   namespace       = var.namespace != "" ? var.namespace : null
-  backend         = vault_jwt_auth_backend.this.path
+  backend         = vault_jwt_auth_backend.default.path
   role_name       = each.key
   role_type       = each.value.role_type
   user_claim      = each.value.user_claim

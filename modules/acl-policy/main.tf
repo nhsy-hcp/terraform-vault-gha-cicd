@@ -1,4 +1,4 @@
-resource "vault_policy" "this" {
+resource "vault_policy" "default" {
   name   = var.name
   policy = var.policy
 }

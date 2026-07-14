@@ -18,9 +18,6 @@ cloud_provider = "aws"
 organization = "nhsy-hcp-org"
 project_name = "terraform-vault-gha-cicd"
 
-# Vault child namespaces to create under admin
-vault_namespaces = ["tn001"]
-
 # Day-2 modules that need a remote-state workspace
 namespaces = ["namespace-admin", "namespace-tn001"]
 
