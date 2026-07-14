@@ -1,4 +1,4 @@
-resource "vault_mount" "this" {
+resource "vault_mount" "default" {
   path        = var.path
   type        = "kv-v2"
   description = var.description
@@ -9,7 +9,7 @@ resource "vault_mount" "this" {
 }
 
 resource "vault_kv_secret_backend_v2" "config" {
-  mount                = vault_mount.this.path
+  mount                = vault_mount.default.path
   max_versions         = var.max_versions
   cas_required         = var.cas_required
   delete_version_after = var.delete_version_after

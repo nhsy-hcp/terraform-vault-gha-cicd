@@ -15,8 +15,8 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design.
 
 | Path | Purpose | State |
 |---|---|---|
-| `bootstrap/` | HCP HVN + Vault cluster + admin token, child namespaces, and HCP Terraform project/team/token + remote-state workspaces | HCP Terraform (`bootstrap`, local execution) |
-| `namespace-admin/` | Day-2 config for the `admin` namespace: `jwt_github` auth, roles, policies | HCP Terraform (`namespace-admin`, GHA execution) |
+| `bootstrap/` | HCP HVN + Vault cluster + admin token, admin-level JWT auth (`jwt_github`), admin role, and HCP Terraform project/team/token + remote-state workspaces | HCP Terraform (`bootstrap`, local execution) |
+| `namespace-admin/` | Day-2 config for the `admin` namespace: child namespace creation, per-namespace JWT auth backends + roles, and per-namespace ACL policies | HCP Terraform (`namespace-admin`, GHA execution) |
 | `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace | HCP Terraform (`namespace-tn001`, GHA execution) |
 | `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `pki-role`, `pki-intermediate`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
 | `policies/` | Reusable ACL policy HCL (`gha-namespace-admin.hcl`) | — |
@@ -116,11 +116,11 @@ task after each rotation to refresh the secret.
 
 ## Onboarding a new namespace (`tn002`)
 
-1. Add `tn002` to `bootstrap/terraform.tfvars` (`vault_namespaces`) and
-   `namespace-<tn002>` to `namespaces`, then `task bootstrap:apply`.
-2. Add `tn002` to `namespace-admin/terraform.tfvars` (`vault_namespaces`), then
-   push to `main` — GHA `namespace-admin.yml` creates the `github-namespace-tn002` role and the
-   `gha-namespace-admin` policy inside `admin/tn002`.
+1. Add `tn002` to `namespace-admin/terraform.auto.tfvars` (`vault_namespaces`) and
+   `namespace-<tn002>` to `bootstrap/terraform.tfvars` (`namespaces`), then `task bootstrap:apply`.
+2. Push to `main` — GHA `namespace-admin.yml` creates the `tn002` child namespace,
+   the `github-namespace-tn002` JWT role, and the `gha-namespace-admin` + `self-token-admin`
+   policies inside `admin/tn002`.
 3. Create the `namespace-tn002/` module with its scoped `vault` provider.
 4. Copy `.github/workflows/namespace-tn001.yml` → `namespace-tn002.yml`, adjusting the
    folder and role.

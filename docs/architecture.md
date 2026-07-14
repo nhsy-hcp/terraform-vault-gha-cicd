@@ -71,8 +71,8 @@ authentication and per-namespace role/policy provisioning, while each tenant nam
 
 | Path | Purpose | Terraform state |
 |---|---|---|
-| `bootstrap/` | HCP HVN + Vault cluster + admin token + child namespace creation | Local |
-| `namespace-admin/` | Day-2 config for the `admin` namespace: JWT auth, roles, policies | HCP Terraform (`nhsy-hcp-org` / `namespace-admin`) |
+| `bootstrap/` | HCP HVN + Vault cluster + admin token, admin-level JWT auth (`jwt_github`), `github-admin` role, `self-token-admin` + `github-admin` policies, and HCP Terraform project/team/token + remote-state workspaces | Local |
+| `namespace-admin/` | Day-2 config for the `admin` namespace: child namespace creation (`modules/namespace`), per-namespace JWT auth backends + roles, and per-namespace ACL policies | HCP Terraform (`nhsy-hcp-org` / `namespace-admin`) |
 | `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace: PKI intermediate CA | HCP Terraform (`nhsy-hcp-org` / `namespace-tn001`) |
 | `policies/` | Reusable ACL policy HCL (e.g. `gha-namespace-admin.hcl`) | — |
 | `modules/` | Reusable Terraform modules for Vault secret engines & auth methods | — |
@@ -82,10 +82,12 @@ authentication and per-namespace role/policy provisioning, while each tenant nam
 Separation of concerns:
 
 - **`bootstrap/`** is a **day-0/day-1** concern — it creates infrastructure (cluster,
-  network) and the child namespaces themselves. It deliberately contains **no** policies
-  or auth backends.
-- **`namespace-admin/`** is a **day-2** concern — it configures authentication and
-  authorization inside Vault.
+  network), the admin-level JWT auth backend, the `github-admin` role, and the
+  `self-token-admin` / `github-admin` ACL policies. It deliberately contains **no**
+  per-namespace resources.
+- **`namespace-admin/`** is a **day-2** concern — it creates child namespaces (via
+  `modules/namespace`) and configures per-namespace authentication and authorization
+  inside each one.
 
 ### 3.1 Reusable Modules (`modules/`)
 
@@ -105,7 +107,7 @@ target namespace), and exposes sensible defaults.
 | `modules/jwt-auth` | Mount a JWT/OIDC auth method and create bound-claim roles | `path`, `oidc_discovery_url` / `bound_issuer`, `default_lease_ttl`, `max_lease_ttl`, `roles` (`user_claim`, `bound_claims`, `token_policies`, TTLs) | `path`, `accessor`, `role_names` |
 | `modules/hcp-tf-workspace` | Provision a remote-state-only HCP Terraform workspace (`execution_mode = "local"`) | `name`, `organization`, `project_id`, `tags`, `terraform_version` | `workspace_id`, `workspace_name` |
 | `modules/acl-policy` | DRY creation of Vault ACL policies from HCL templates | `name`, `policy` (HCL string) | `name` |
-| `modules/namespace` | Consistent child-namespace creation | `paths` (list) | `namespace_paths` |
+| `modules/namespace` | Complete child-namespace setup: creates the namespace, installs `self-token-admin` + `gha-namespace-admin` policies, and mounts a `jwt_github` auth backend with a per-namespace role inside the child namespace | `name`, `vault_auth_mount_path`, `github_organization`, `github_repository`, `default_lease_ttl`, `max_lease_ttl` | `path`, `path_fq`, `jwt_auth_backend_path`, `jwt_role_name` |
 
 #### `modules/kv-engine`
 
@@ -241,9 +243,9 @@ active token at a time, so re-applying rotates it.
 
 ## 4. Bootstrap Module (`bootstrap/`)
 
-Provisions the underlying HCP infrastructure, the Vault namespaces, and the **HCP Terraform
-objects** (project, team, team token, per-namespace remote-state workspaces — see §3.2) that
-back the day-2 modules.
+Provisions the underlying HCP infrastructure, the admin-level JWT auth backend and roles,
+admin-scoped ACL policies, and the **HCP Terraform objects** (project, team, team token,
+per-namespace remote-state workspaces — see §3.2) that back the day-2 modules.
 
 ### Resources
 
@@ -251,8 +253,9 @@ back the day-2 modules.
 - `hcp_vault_cluster` — the HCP Vault cluster (tier, region, public endpoint configurable).
 - `hcp_vault_cluster_admin_token` — short-lived admin token used for initial config.
 - `random_pet` — suffix to keep the cluster ID unique.
-- `vault_namespace` (for_each over `var.vault_namespaces`) — creates child namespaces
-  such as `tn001` under `admin`.
+- `module.self_token_admin_policy` — `self-token-admin` ACL policy in the `admin` namespace.
+- `module.github_admin_policy` — `github-admin` ACL policy in the `admin` namespace.
+- `module.jwt_github` — `jwt_github` JWT auth backend in the `admin` namespace, with the `github-admin` role.
 - `tfe_project` — HCP Terraform project named after the GitHub repo (§3.2).
 - `tfe_team` + `tfe_team_project_access` — CI team with access to the project.
 - `tfe_team_token` — team token exported as the `TFE_TOKEN` GitHub secret.
@@ -279,7 +282,11 @@ back the day-2 modules.
 | `hvn_cidr_block` | `172.25.16.0/20` | HVN CIDR |
 | `vault_tier` | `dev` | HCP Vault tier |
 | `public_endpoint` | `true` | Expose a public Vault endpoint |
-| `vault_namespaces` | `[]` | Child namespace paths to create under `admin` |
+| `vault_auth_mount_path` | `jwt_github` | Mount path for the admin JWT auth backend |
+| `github_organization` | `nhsy-hcp` | GitHub organization |
+| `github_repository` | `terraform-vault-gha-cicd` | GitHub repository |
+| `default_lease_ttl` | `1h` | Default lease TTL for the JWT auth backend |
+| `max_lease_ttl` | `4h` | Maximum lease TTL for the JWT auth backend |
 | `organization` | `nhsy-hcp-org` | HCP Terraform organization |
 | `project_name` | `terraform-vault-gha-cicd` | HCP Terraform project name (= repo name) |
 | `namespaces` | `["namespace-admin", "namespace-tn001"]` | Day-2 modules needing a remote-state workspace |
@@ -290,7 +297,7 @@ back the day-2 modules.
   `vault_tier`, `region`, `cloud_provider`, `vault_cluster_state`.
 - `vault_admin_token` (sensitive), `vault_env_exports` (sensitive) — used to seed the
   local Vault environment.
-- `vault_namespaces` — the created child namespace paths.
+- `vault_jwt_auth_backend_path`, `vault_github_admin_role` — admin JWT auth details.
 - `tfe_project_id`, `tfe_team_id`, `tfe_workspace_ids` — HCP Terraform object IDs (§3.2).
 - `tfe_team_token` (sensitive) — set as the `TFE_TOKEN` GitHub Actions secret.
 

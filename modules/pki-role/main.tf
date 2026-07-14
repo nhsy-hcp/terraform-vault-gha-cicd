@@ -1,4 +1,4 @@
-resource "vault_pki_secret_backend_role" "this" {
+resource "vault_pki_secret_backend_role" "default" {
   backend            = var.backend
   name               = var.name
   issuer_ref         = var.issuer_ref

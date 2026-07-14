@@ -16,8 +16,8 @@ eval "$(task bootstrap:env)"        # sets VAULT_ADDR and VAULT_TOKEN
 
 | Path | Purpose |
 |---|---|
-| `bootstrap/` | HCP cluster, child namespaces, HCP Terraform workspaces |
-| `namespace-admin/` | `admin` namespace: JWT auth, roles, policies |
+| `bootstrap/` | HCP cluster, HCP Terraform workspaces, admin-level JWT auth |
+| `namespace-admin/` | `admin` namespace: child namespace creation, per-namespace JWT auth, roles, policies |
 | `namespace-tn001/` | `admin/tn001` tenant namespace |
 | `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `pki-role`, `pki-intermediate`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` |
 | `policies/` | ACL policy HCL files |
@@ -82,7 +82,7 @@ All workspaces use HCP Terraform for remote state (`execution_mode = "local"`). 
 ## tfvars Convention
 
 - `terraform.tfvars` is git-ignored — do not use it.
-- Use `terraform.auto.tfvars` for committed variable files (e.g., `namespace-tn001/terraform.auto.tfvars`).
+- Use `terraform.auto.tfvars` for committed variable files (e.g., `namespace-admin/terraform.auto.tfvars`, `namespace-tn001/terraform.auto.tfvars`).
 
 ## PKI Module Notes
 
