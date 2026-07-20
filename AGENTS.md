@@ -22,7 +22,8 @@ commands directly. The task wrappers (`task namespace-admin:plan`,
 | `bootstrap/` | HCP cluster, HCP Terraform workspaces, admin-level JWT auth |
 | `namespace-admin/` | `admin` namespace: child namespace creation, per-namespace JWT auth, roles, policies |
 | `namespace-tn001/` | `admin/tn001` tenant namespace |
-| `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `pki-role`, `pki-intermediate`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` |
+| `modules/` | Reusable modules: `kv-engine`, `pki-intermediate`, `pki-role`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` |
+| `docs/` | Implementation guides: `architecture.md`, `pki-instructions.md`, `instructions.md` |
 | `policies/` | ACL policy HCL files |
 | `scripts/` | Bash helper scripts (all must pass `shellcheck`) |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows |

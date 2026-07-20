@@ -9,7 +9,7 @@ its short-lived GitHub OIDC token for a scoped Vault token. Authorization is enf
 through Vault **namespaces**, **JWT roles** (bound to specific repositories and workflows),
 and least-privilege **ACL policies**.
 
-See [`docs/architecture.md`](docs/architecture.md) for the full design.
+See [`docs/architecture.md`](docs/architecture.md) for the full design and [`docs/pki-instructions.md`](docs/pki-instructions.md) for the PKI engine setup and certificate operations guide.
 
 ## Layout
 
@@ -18,7 +18,7 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design.
 | `bootstrap/` | HCP HVN + Vault cluster + admin token, admin-level JWT auth (`jwt_github`), admin role, and HCP Terraform project/team/token + remote-state workspaces | HCP Terraform (`bootstrap`, local execution) |
 | `namespace-admin/` | Day-2 config for the `admin` namespace: child namespace creation, per-namespace JWT auth backends + roles, and per-namespace ACL policies | HCP Terraform (`namespace-admin`, GHA execution) |
 | `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace | HCP Terraform (`namespace-tn001`, GHA execution) |
-| `modules/` | Reusable modules: `kv-engine`, `pki-engine`, `pki-role`, `pki-intermediate`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
+| `modules/` | Reusable modules: `kv-engine`, `pki-intermediate`, `pki-role`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
 | `policies/` | Reusable ACL policy HCL (`gha-namespace-admin.hcl`) | — |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows | — |
 
