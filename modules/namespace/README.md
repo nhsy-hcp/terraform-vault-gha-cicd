@@ -27,10 +27,10 @@ No requirements.
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_default_lease_ttl"></a> [default\_lease\_ttl](#input\_default\_lease\_ttl) | Default lease TTL for tokens issued by the JWT auth backend. | `string` | `"1h"` | no |
+| <a name="input_default_lease_ttl"></a> [default\_lease\_ttl](#input\_default\_lease\_ttl) | Default lease TTL for tokens issued by the JWT auth backend. | `string` | `"10m"` | no |
 | <a name="input_github_organization"></a> [github\_organization](#input\_github\_organization) | GitHub organization that owns the repository. | `string` | n/a | yes |
 | <a name="input_github_repository"></a> [github\_repository](#input\_github\_repository) | GitHub repository bound to the JWT auth role. | `string` | n/a | yes |
-| <a name="input_max_lease_ttl"></a> [max\_lease\_ttl](#input\_max\_lease\_ttl) | Maximum lease TTL for tokens issued by the JWT auth backend. | `string` | `"4h"` | no |
+| <a name="input_max_lease_ttl"></a> [max\_lease\_ttl](#input\_max\_lease\_ttl) | Maximum lease TTL for tokens issued by the JWT auth backend. | `string` | `"10m"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Child namespace path to create under the current provider namespace. | `string` | n/a | yes |
 | <a name="input_vault_auth_mount_path"></a> [vault\_auth\_mount\_path](#input\_vault\_auth\_mount\_path) | Mount path for the GitHub OIDC JWT auth backend inside the namespace. | `string` | `"jwt_github"` | no |
 

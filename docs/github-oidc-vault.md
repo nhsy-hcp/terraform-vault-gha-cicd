@@ -71,8 +71,8 @@ regardless of role-level settings:
 
 ```sh
 vault auth tune \
-  -default-lease-ttl=1h \
-  -max-lease-ttl=4h \
+  -default-lease-ttl=10m \
+  -max-lease-ttl=10m \
   jwt_github
 ```
 
@@ -174,7 +174,7 @@ user_claim             workflow
 ```
 
 > `token_ttl` and `token_max_ttl` show `0s` when the role inherits the
-> mount-level tune values (`1h` / `4h`). This is expected — the effective
+> mount-level tune values (`10m` / `10m`). This is expected — the effective
 > limits are enforced by the mount tune, not stored on the role itself.
 
 ---

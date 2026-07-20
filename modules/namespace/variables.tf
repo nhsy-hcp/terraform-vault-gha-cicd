@@ -22,11 +22,11 @@ variable "github_repository" {
 variable "default_lease_ttl" {
   description = "Default lease TTL for tokens issued by the JWT auth backend."
   type        = string
-  default     = "1h"
+  default     = "10m"
 }
 
 variable "max_lease_ttl" {
   description = "Maximum lease TTL for tokens issued by the JWT auth backend."
   type        = string
-  default     = "4h"
+  default     = "10m"
 }
