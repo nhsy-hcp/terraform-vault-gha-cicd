@@ -25,6 +25,7 @@ module "jwt_github" {
   namespace         = vault_namespace.default.path
   path              = var.vault_auth_mount_path
   description       = "GitHub Actions OIDC JWT auth"
+  bound_issuer      = "https://token.actions.githubusercontent.com"
   default_lease_ttl = var.default_lease_ttl
   max_lease_ttl     = var.max_lease_ttl
   roles = {
