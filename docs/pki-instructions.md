@@ -392,8 +392,7 @@ vault write pki-int/crl/rotate
 Verify the serial appears in the updated CRL:
 
 ```sh
-vault read -field=crl pki-int/cert/crl \
-  | openssl crl -noout -text -inform DER \
+vault read -field=certificate pki-int/cert/crl | openssl crl -noout -text \
   | grep -A2 "Revoked"
 ```
 
@@ -448,8 +447,7 @@ openssl x509 -noout -text -in /tmp/issued.pem \
 Fetch and inspect the CRL:
 
 ```sh
-vault read -field=crl pki-int/cert/crl \
-  | openssl crl -noout -text -inform DER
+vault read -field=certificate pki-int/cert/crl | openssl crl -noout -text
 ```
 
 List all issuers and read a specific one:
