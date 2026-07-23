@@ -46,11 +46,11 @@ authentication and per-namespace role/policy provisioning, while each tenant nam
 │    ├─ role: github-admin            → policies: self-token-admin,          │
 │    │                                             github-admin              │
 │    ├─ role: github-namespace-tn001  → policies: self-token-admin,         │
-│    │                                             gha-namespace-admin       │
-│    ├─ policies: self-token-admin, github-admin, gha-namespace-admin       │
+│    │                                             github-namespace-admin    │
+│    ├─ policies: self-token-admin, github-admin, github-namespace-admin    │
 │    │                                                                       │
 │    └─ namespace: admin/tn001                                              │
-│         └─ policy: gha-namespace-admin (applied inside the child ns)      │
+│         └─ policy: github-namespace-admin (applied inside the child ns)   │
 │                                                                            │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -74,7 +74,7 @@ authentication and per-namespace role/policy provisioning, while each tenant nam
 | `bootstrap/` | HCP HVN + Vault cluster + admin token, admin-level JWT auth (`jwt_github`), `github-admin` role, `self-token-admin` + `github-admin` policies, and HCP Terraform project/team/token + remote-state workspaces | Local |
 | `namespace-admin/` | Day-2 config for the `admin` namespace: child namespace creation (`modules/namespace`), per-namespace JWT auth backends + roles, and per-namespace ACL policies | HCP Terraform (`nhsy-hcp-org` / `namespace-admin`) |
 | `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace: PKI intermediate CA | HCP Terraform (`nhsy-hcp-org` / `namespace-tn001`) |
-| `policies/` | Reusable ACL policy HCL (e.g. `gha-namespace-admin.hcl`) | — |
+| `policies/` | Reusable ACL policy HCL (e.g. `github-namespace-admin.hcl`) | — |
 | `modules/` | Reusable Terraform modules for Vault secret engines & auth methods | — |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows | — |
 | `Taskfile.yml` | Task runner wrappers for each module lifecycle | — |
@@ -107,7 +107,7 @@ target namespace), and exposes sensible defaults.
 | `modules/jwt-auth` | Mount a JWT/OIDC auth method and create bound-claim roles | `path`, `oidc_discovery_url` / `bound_issuer`, `default_lease_ttl`, `max_lease_ttl`, `roles` (`user_claim`, `bound_claims`, `token_policies`, TTLs) | `path`, `accessor`, `role_names` |
 | `modules/hcp-tf-workspace` | Provision a remote-state-only HCP Terraform workspace (`execution_mode = "local"`) | `name`, `organization`, `project_id`, `tags`, `terraform_version` | `workspace_id`, `workspace_name` |
 | `modules/acl-policy` | DRY creation of Vault ACL policies from HCL templates | `name`, `policy` (HCL string) | `name` |
-| `modules/namespace` | Complete child-namespace setup: creates the namespace, installs `self-token-admin` + `gha-namespace-admin` policies, and mounts a `jwt_github` auth backend with a per-namespace role inside the child namespace | `name`, `vault_auth_mount_path`, `github_organization`, `github_repository`, `default_lease_ttl`, `max_lease_ttl` | `path`, `path_fq`, `jwt_auth_backend_path`, `jwt_role_name` |
+| `modules/namespace` | Complete child-namespace setup: creates the namespace, installs `self-token-admin` + `github-namespace-admin` policies, and mounts a `jwt_github` auth backend with a per-namespace role inside the child namespace | `name`, `vault_auth_mount_path`, `github_organization`, `github_repository`, `default_lease_ttl`, `max_lease_ttl` | `path`, `path_fq`, `jwt_auth_backend_path`, `jwt_role_name` |
 
 #### `modules/kv-engine`
 
@@ -354,7 +354,7 @@ day-2 configuration.
 
 - `user_claim = "workflow"`
 - `bound_claims = { repository = "nhsy-hcp/terraform-vault-gha-cicd", workflow = "namespace-<name>" }`
-- `token_policies = ["self-token-admin", "gha-namespace-admin"]`
+- `token_policies = ["self-token-admin", "github-namespace-admin"]`
 
 Binding on **both** `repository` and `workflow` ensures only the specific workflow file
 for that namespace can assume the role — a run from a different workflow or fork is
@@ -365,7 +365,7 @@ rejected.
 | Role | `user_claim` | Bound claims | Policies |
 |---|---|---|---|
 | `github-admin` | `repository` | `repository` | `self-token-admin`, `github-admin` |
-| `github-namespace-tn001` | `workflow` | `repository`, `workflow` | `self-token-admin`, `gha-namespace-admin` |
+| `github-namespace-tn001` | `workflow` | `repository`, `workflow` | `self-token-admin`, `github-namespace-admin` |
 
 ---
 
@@ -390,9 +390,9 @@ management, and JWT auth config/roles:
 - `sys/policies/acl`, `sys/policies/acl/*`
 - `auth/jwt/config`, `auth/jwt/role`, `auth/jwt/role/*`
 
-### `gha-namespace-admin` (universal, per-namespace)
+### `github-namespace-admin` (universal, per-namespace)
 
-A single reusable policy (`policies/gha-namespace-admin.hcl`) granting the broad set of
+A single reusable policy (`policies/github-namespace-admin.hcl`) granting the broad set of
 capabilities a namespace admin needs — auth backends, identity, policies, mounts, quotas.
 
 Crucially, it contains **no namespace-name references**. It is created **inside each child
@@ -406,7 +406,7 @@ needed.
 ```text
 admin namespace
   ├─ github-admin        → can manage namespaces, JWT, policies (admin scope)
-  └─ per-namespace role  → token scoped to admin/<name>, holds gha-namespace-admin
+  └─ per-namespace role  → token scoped to admin/<name>, holds github-namespace-admin
                            policy applied INSIDE that child namespace
 ```
 
@@ -469,7 +469,7 @@ Variables (GitHub Actions environment variables):
 | Namespace | Managed by | Contents |
 |---|---|---|
 | `admin` | `namespace-admin/` | `jwt_github` auth, all roles, `github-admin` + `self-token-admin` policies, per-namespace role/policy provisioning |
-| `admin/tn001` | `namespace-tn001/` | PKI intermediate CA (`pki-int` mount); `gha-namespace-admin` policy applied inside |
+| `admin/tn001` | `namespace-tn001/` | PKI intermediate CA (`pki-int` mount); `github-namespace-admin` policy applied inside |
 
 Tenant namespaces are created by `bootstrap/` but **configured** by their own day-2
 modules, keeping each tenant's blast radius contained.
@@ -536,7 +536,7 @@ task namespace-admin:apply          # JWT auth, roles, policies
 
 1. Add `tn002` to `bootstrap/terraform.tfvars` → `task bootstrap:apply`.
 2. Add `tn002` to `namespace-admin/terraform.tfvars` → `task namespace-admin:apply`
-   (creates the `github-namespace-tn002` role + `gha-namespace-admin` policy).
+   (creates the `github-namespace-tn002` role + `github-namespace-admin` policy).
 3. Create the `namespace-tn002/` module with its scoped `vault` provider.
 4. Copy `namespace-tn001.yml` → `namespace-tn002.yml`, adjusting the folder and role.
 
@@ -571,6 +571,6 @@ task namespace-admin:apply          # JWT auth, roles, policies
 > project/team/token/workspaces), the reusable `modules/` (`kv-engine`, `pki-intermediate`,
 > `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace`), `namespace-admin/` (JWT auth,
 > roles, policies), `namespace-tn001/` (PKI intermediate CA — feature branch
-> `feat/pki-engine-tn001`), `policies/gha-namespace-admin.hcl`, and the GitHub Actions
+> `feat/pki-engine-tn001`), `policies/github-namespace-admin.hcl`, and the GitHub Actions
 > workflows. The on-demand candidate modules (`database-secrets`, `transit`, `approle`)
 > remain unimplemented by design.

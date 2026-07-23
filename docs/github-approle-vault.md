@@ -81,28 +81,28 @@ vault read sys/auth/approle/tune
 
 Two policies are required. Both ship with this repository under `policies/`.
 
-**`gha-namespace-admin`** — grants the workflow full administrative access
+**`github-namespace-admin`** — grants the workflow full administrative access
 within `admin/tn001`: mount lifecycle, auth backends, PKI, identity, and ACL
-policies. See [`policies/gha-namespace-admin.hcl`](../policies/gha-namespace-admin.hcl).
+policies. See [`policies/github-namespace-admin.hcl`](../policies/github-namespace-admin.hcl).
 
 ```sh
-vault policy write gha-namespace-admin policies/gha-namespace-admin.hcl
+vault policy write github-namespace-admin policies/github-namespace-admin.hcl
 ```
 
 **`self-token-admin`** — allows a token to look up, renew, and revoke itself
 only. Also grants `auth/token/create`, which the Vault Terraform provider
 requires to scope child tokens to the target namespace. See
-[`policies/gha-self-token-admin.hcl`](../policies/gha-self-token-admin.hcl).
+[`policies/github-self-token-admin.hcl`](../policies/github-self-token-admin.hcl).
 
 ```sh
-vault policy write self-token-admin policies/gha-self-token-admin.hcl
+vault policy write self-token-admin policies/github-self-token-admin.hcl
 ```
 
 Verify:
 
 ```sh
 vault policy list
-vault policy read gha-namespace-admin
+vault policy read github-namespace-admin
 vault policy read self-token-admin
 ```
 
@@ -120,7 +120,7 @@ vault write auth/approle/role/github-namespace-tn001 \
   secret_id_ttl=24h \
   token_ttl=10m \
   token_max_ttl=10m \
-  token_policies="gha-namespace-admin,self-token-admin"
+  token_policies="github-namespace-admin,self-token-admin"
 ```
 
 ### Role parameter reference
@@ -131,7 +131,7 @@ vault write auth/approle/role/github-namespace-tn001 \
 | `secret_id_ttl` | `24h` | Secret IDs expire after 24 hours; rotate at least this often |
 | `token_ttl` | `10m` | Lifetime of issued tokens |
 | `token_max_ttl` | `10m` | Hard ceiling; tokens cannot be renewed beyond this |
-| `token_policies` | `gha-namespace-admin,self-token-admin` | Policies attached to every issued token |
+| `token_policies` | `github-namespace-admin,self-token-admin` | Policies attached to every issued token |
 
 ---
 
@@ -226,7 +226,7 @@ Expected output includes:
 bind_secret_id         true
 secret_id_ttl          24h
 token_max_ttl          10m
-token_policies         [gha-namespace-admin self-token-admin]
+token_policies         [github-namespace-admin self-token-admin]
 token_ttl              10m
 ```
 
@@ -296,6 +296,6 @@ vault auth disable approle
 Delete individual policies if the mount is being removed:
 
 ```sh
-vault policy delete gha-namespace-admin
+vault policy delete github-namespace-admin
 vault policy delete self-token-admin
 ```

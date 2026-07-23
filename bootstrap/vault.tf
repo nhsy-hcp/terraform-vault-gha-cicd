@@ -3,7 +3,7 @@ module "self_token_admin_policy" {
   source = "../modules/acl-policy"
 
   name   = "self-token-admin"
-  policy = file("${path.module}/../policies/gha-self-token-admin.hcl")
+  policy = file("${path.module}/../policies/github-self-token-admin.hcl")
 }
 
 # Exactly what the namespace-admin Terraform requires: namespace management,
@@ -12,7 +12,7 @@ module "github_admin_policy" {
   source = "../modules/acl-policy"
 
   name   = "github-admin"
-  policy = file("${path.module}/../policies/gha-admin.hcl")
+  policy = file("${path.module}/../policies/github-admin.hcl")
 }
 
 # jwt_github JWT auth backend in the admin namespace — admin role only.

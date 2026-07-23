@@ -19,7 +19,7 @@ See [`docs/architecture.md`](docs/architecture.md) for the full design and [`doc
 | `namespace-admin/` | Day-2 config for the `admin` namespace: child namespace creation, per-namespace JWT auth backends + roles, and per-namespace ACL policies | HCP Terraform (`namespace-admin`, GHA execution) |
 | `namespace-tn001/` | Day-2 config for the `admin/tn001` tenant namespace | HCP Terraform (`namespace-tn001`, GHA execution) |
 | `modules/` | Reusable modules: `kv-engine`, `pki-intermediate`, `pki-role`, `jwt-auth`, `hcp-tf-workspace`, `acl-policy`, `namespace` | — |
-| `policies/` | Reusable ACL policy HCL (`gha-namespace-admin.hcl`) | — |
+| `policies/` | Reusable ACL policy HCL (`github-namespace-admin.hcl`) | — |
 | `.github/workflows/` | Reusable + per-namespace GitHub Actions workflows | — |
 
 ## Prerequisites
@@ -139,7 +139,7 @@ task after each rotation to refresh the secret.
 1. Add `tn002` to `namespace-admin/terraform.auto.tfvars` (`vault_namespaces`) and
    `namespace-<tn002>` to `bootstrap/terraform.tfvars` (`namespaces`), then `task bootstrap:apply`.
 2. Push to `main` — GHA `namespace-admin.yml` creates the `tn002` child namespace,
-   the `github-namespace-tn002` JWT role, and the `gha-namespace-admin` + `self-token-admin`
+   the `github-namespace-tn002` JWT role, and the `github-namespace-admin` + `self-token-admin`
    policies inside `admin/tn002`.
 3. Create the `namespace-tn002/` module with its scoped `vault` provider.
 4. Copy `.github/workflows/namespace-tn001.yml` → `namespace-tn002.yml`, adjusting the

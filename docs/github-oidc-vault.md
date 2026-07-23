@@ -89,28 +89,28 @@ vault read sys/auth/jwt_github/tune
 
 Two policies are required. Both ship with this repository under `policies/`.
 
-**`gha-namespace-admin`** — grants the workflow full administrative access
+**`github-namespace-admin`** — grants the workflow full administrative access
 within `admin/tn001`: mount lifecycle, auth backends, PKI, identity, and ACL
-policies. See [`policies/gha-namespace-admin.hcl`](../policies/gha-namespace-admin.hcl).
+policies. See [`policies/github-namespace-admin.hcl`](../policies/github-namespace-admin.hcl).
 
 ```sh
-vault policy write gha-namespace-admin policies/gha-namespace-admin.hcl
+vault policy write github-namespace-admin policies/github-namespace-admin.hcl
 ```
 
 **`self-token-admin`** — allows a token to look up, renew, and revoke itself
 only. Also grants `auth/token/create`, which the Vault Terraform provider
 requires to scope child tokens to the target namespace. See
-[`policies/gha-self-token-admin.hcl`](../policies/gha-self-token-admin.hcl).
+[`policies/github-self-token-admin.hcl`](../policies/github-self-token-admin.hcl).
 
 ```sh
-vault policy write self-token-admin policies/gha-self-token-admin.hcl
+vault policy write self-token-admin policies/github-self-token-admin.hcl
 ```
 
 Verify:
 
 ```sh
 vault policy list
-vault policy read gha-namespace-admin
+vault policy read github-namespace-admin
 vault policy read self-token-admin
 ```
 
@@ -132,7 +132,7 @@ vault write auth/jwt_github/role/github-namespace-tn001 \
   bound_claims_type="string" \
   bound_claims=repository=nhsy-hcp/terraform-vault-gha-cicd \
   bound_claims=workflow=namespace-tn001 \
-  token_policies="gha-namespace-admin,self-token-admin"
+  token_policies="github-namespace-admin,self-token-admin"
 ```
 
 ### Bound claims reference
@@ -167,7 +167,7 @@ Expected role output includes:
 bound_audiences        [https://github.com/nhsy-hcp]
 bound_claims           map[repository:[nhsy-hcp/terraform-vault-gha-cicd] workflow:[namespace-tn001]]
 bound_claims_type      string
-token_policies         [self-token-admin gha-namespace-admin]
+token_policies         [self-token-admin github-namespace-admin]
 token_ttl              0s
 token_max_ttl          0s
 user_claim             workflow
@@ -228,6 +228,6 @@ vault auth disable jwt_github
 Delete individual policies if the mount is being removed:
 
 ```sh
-vault policy delete gha-namespace-admin
+vault policy delete github-namespace-admin
 vault policy delete self-token-admin
 ```

@@ -1,4 +1,4 @@
-# gha-namespace-admin
+# github-namespace-admin
 #
 # Universal, reusable ACL policy granting the broad capabilities a namespace admin
 # needs (auth backends, identity, policies, mounts, quotas). It contains NO

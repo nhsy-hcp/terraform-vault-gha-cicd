@@ -10,13 +10,13 @@ resource "vault_namespace" "default" {
 resource "vault_policy" "self_token_admin" {
   namespace = vault_namespace.default.path
   name      = "self-token-admin"
-  policy    = file("${path.module}/../../policies/gha-self-token-admin.hcl")
+  policy    = file("${path.module}/../../policies/github-self-token-admin.hcl")
 }
 
 resource "vault_policy" "gha_namespace_admin" {
   namespace = vault_namespace.default.path
-  name      = "gha-namespace-admin"
-  policy    = file("${path.module}/../../policies/gha-namespace-admin.hcl")
+  name      = "github-namespace-admin"
+  policy    = file("${path.module}/../../policies/github-namespace-admin.hcl")
 }
 
 module "jwt_github" {
@@ -36,7 +36,7 @@ module "jwt_github" {
         repository = local.bound_repository
         workflow   = "namespace-${var.name}"
       }
-      token_policies = ["self-token-admin", "gha-namespace-admin"]
+      token_policies = ["self-token-admin", "github-namespace-admin"]
     }
   }
 

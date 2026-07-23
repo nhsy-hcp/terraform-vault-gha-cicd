@@ -24,6 +24,6 @@ provider "vault" {
 
 # Day-2 configuration for the admin/tn001 tenant namespace.
 #
-# The gha-namespace-admin policy is provisioned inside admin/tn001 by
+# The github-namespace-admin policy is provisioned inside admin/tn001 by
 # namespace-admin/. Secret engines are defined in their own files:
 #   pki.tf — PKI intermediate CA (offline-root pattern)
