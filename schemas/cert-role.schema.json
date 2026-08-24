@@ -111,41 +111,6 @@
       "type": "boolean",
       "description": "Force CN usage."
     },
-    "ou": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Organizational unit of generated certificates."
-    },
-    "organization": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Organization of generated certificates."
-    },
-    "country": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Country of generated certificates."
-    },
-    "locality": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Locality of generated certificates."
-    },
-    "province": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Province of generated certificates."
-    },
-    "street_address": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Street address of generated certificates."
-    },
-    "postal_code": {
-      "type": "array",
-      "items": { "type": "string" },
-      "description": "Postal code of generated certificates."
-    },
     "generate_lease": {
       "type": "boolean",
       "description": "Generate a Vault lease for issued certificates."

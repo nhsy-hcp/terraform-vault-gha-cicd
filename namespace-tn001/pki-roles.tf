@@ -44,14 +44,6 @@ module "cert_request_roles" {
   use_csr_common_name = try(each.value.use_csr_common_name, true)
   use_csr_sans        = try(each.value.use_csr_sans, true)
 
-  ou             = try(each.value.ou, [])
-  organization   = try(each.value.organization, [])
-  country        = try(each.value.country, [])
-  locality       = try(each.value.locality, [])
-  province       = try(each.value.province, [])
-  street_address = try(each.value.street_address, [])
-  postal_code    = try(each.value.postal_code, [])
-
   generate_lease = try(each.value.generate_lease, false)
   no_store       = try(each.value.no_store, false)
   require_cn     = try(each.value.require_cn, true)
