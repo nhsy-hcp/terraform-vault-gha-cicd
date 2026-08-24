@@ -31,14 +31,3 @@ module "namespace_workspace" {
   organization = var.organization
   project_id   = tfe_project.main.id
 }
-
-resource "tfe_variable" "vault_address" {
-  for_each = toset(var.namespaces)
-
-  workspace_id = module.namespace_workspace[each.value].workspace_id
-  key          = "TF_VAR_vault_address"
-  value        = hcp_vault_cluster.vault_cluster.vault_public_endpoint_url
-  category     = "env"
-  description  = "Vault public endpoint URL injected as vault_address Terraform variable"
-  sensitive    = false
-}

@@ -161,6 +161,7 @@ tasks:
     dir: "{{.BOOTSTRAP_DIR}}"
     cmds:
       - terraform output -raw vault_public_endpoint_url | gh variable set VAULT_ADDR
+      - terraform output -raw vault_public_endpoint_url | gh variable set TF_VAR_vault_address
       - terraform output -raw tfe_team_token | gh secret set TFE_TOKEN
 
   bootstrap:clean:
