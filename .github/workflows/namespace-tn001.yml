@@ -17,8 +17,11 @@ jobs:
   lint:
     uses: ./.github/workflows/lint.yml
 
+  validate:
+    uses: ./.github/workflows/validate-cert-requests.yml
+
   deploy:
-    needs: lint
+    needs: [lint, validate]
     uses: ./.github/workflows/_terraform-namespace.yml
     with:
       namespace: namespace-tn001

@@ -1,0 +1,176 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PKI Certificate Role Request",
+  "description": "Schema for Vault PKI certificate role request YAML files under namespace-tn001/requests/certificates/.",
+  "type": "object",
+  "required": ["allowed_domains"],
+  "additionalProperties": false,
+  "properties": {
+    "allowed_domains": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "List of domains for which certificates can be requested."
+    },
+    "allow_bare_domains": {
+      "type": "boolean",
+      "description": "Allow certificates matching the exact allowed_domains entries."
+    },
+    "allow_subdomains": {
+      "type": "boolean",
+      "description": "Allow certificates for subdomains of allowed_domains."
+    },
+    "allow_localhost": {
+      "type": "boolean",
+      "description": "Allow certificates for localhost."
+    },
+    "allow_wildcard_certificates": {
+      "type": "boolean",
+      "description": "Allow wildcard certificates."
+    },
+    "enforce_hostnames": {
+      "type": "boolean",
+      "description": "Allow only valid host names."
+    },
+    "allow_ip_sans": {
+      "type": "boolean",
+      "description": "Allow IP SANs."
+    },
+    "allowed_uri_sans": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed URI SANs."
+    },
+    "allowed_other_sans": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed custom SANs."
+    },
+    "allowed_serial_numbers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed serial numbers to put in Subject."
+    },
+    "ttl": {
+      "type": "string",
+      "description": "Default TTL in seconds for issued certificates (e.g. 86400)."
+    },
+    "max_ttl": {
+      "type": "string",
+      "description": "Maximum TTL in seconds for issued certificates (e.g. 604800)."
+    },
+    "key_type": {
+      "type": "string",
+      "enum": ["ec", "rsa", "ed25519", "any"],
+      "description": "Key algorithm for issued certificates."
+    },
+    "key_bits": {
+      "type": "integer",
+      "description": "Number of bits for the generated key."
+    },
+    "signature_bits": {
+      "type": "integer",
+      "description": "Number of bits to use in the signature algorithm."
+    },
+    "key_usage": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed key usage constraints on issued certificates."
+    },
+    "ext_key_usage": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed extended key usage constraints on issued certificates."
+    },
+    "ext_key_usage_oids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Allowed extended key usage OIDs on issued certificates."
+    },
+    "server_flag": {
+      "type": "boolean",
+      "description": "Certificates for server use."
+    },
+    "cn_validations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["email", "hostname", "disabled"]
+      },
+      "description": "Validations to run on the CN field."
+    },
+    "use_csr_common_name": {
+      "type": "boolean",
+      "description": "Use the CN in the CSR."
+    },
+    "use_csr_sans": {
+      "type": "boolean",
+      "description": "Use the SANs in the CSR."
+    },
+    "require_cn": {
+      "type": "boolean",
+      "description": "Force CN usage."
+    },
+    "ou": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Organizational unit of generated certificates."
+    },
+    "organization": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Organization of generated certificates."
+    },
+    "country": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Country of generated certificates."
+    },
+    "locality": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Locality of generated certificates."
+    },
+    "province": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Province of generated certificates."
+    },
+    "street_address": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Street address of generated certificates."
+    },
+    "postal_code": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Postal code of generated certificates."
+    },
+    "generate_lease": {
+      "type": "boolean",
+      "description": "Generate a Vault lease for issued certificates."
+    },
+    "no_store": {
+      "type": "boolean",
+      "description": "Do not store certificates in the Vault storage backend."
+    },
+    "policy_identifier": {
+      "type": "array",
+      "description": "Policy identifier blocks (Vault 1.11+).",
+      "items": {
+        "type": "object",
+        "required": ["oid"],
+        "additionalProperties": false,
+        "properties": {
+          "oid":    { "type": "string" },
+          "notice": { "type": "string" },
+          "cps":    { "type": "string" }
+        }
+      }
+    },
+    "issuer_ref": {
+      "type": "string",
+      "description": "Reference to the named issuer. Defaults to 'default'."
+    }
+  }
+}

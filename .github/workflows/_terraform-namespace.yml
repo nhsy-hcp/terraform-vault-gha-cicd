@@ -41,7 +41,7 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TFE_TOKEN }}
 
       - name: Authenticate to Vault
-        uses: hashicorp/vault-action@v4.0.0
+        uses: hashicorp/vault-action@v4.0.1
         with:
           exportToken: true
           url: ${{ env.VAULT_ADDR }}
