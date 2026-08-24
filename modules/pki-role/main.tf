@@ -31,14 +31,6 @@ resource "vault_pki_secret_backend_role" "default" {
   use_csr_common_name = var.use_csr_common_name
   use_csr_sans        = var.use_csr_sans
 
-  ou             = var.ou
-  organization   = var.organization
-  country        = var.country
-  locality       = var.locality
-  province       = var.province
-  street_address = var.street_address
-  postal_code    = var.postal_code
-
   generate_lease = var.generate_lease
   no_store       = var.no_store
   require_cn     = var.require_cn
