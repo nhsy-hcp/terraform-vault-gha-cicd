@@ -6,6 +6,12 @@ vars:
   NAMESPACE_TN001_DIR: namespace-tn001
   ACT_ARCH: linux/amd64
 
+env:
+  VAULT_ADDR:
+    sh: terraform -chdir={{.BOOTSTRAP_DIR}} output -raw vault_public_endpoint_url 2>/dev/null || echo ""
+  VAULT_TOKEN:
+    sh: terraform -chdir={{.BOOTSTRAP_DIR}} output -raw vault_admin_token 2>/dev/null || echo ""
+
 tasks:
   # ---------------------------------------------------------------------------
   # Top-level tasks
@@ -377,7 +383,9 @@ tasks:
     desc: Run both PKI issue and sign endpoint tests
     cmds:
       - task: pki:test:issue
+        vars: {ROLE: helloworld-example-com}
       - task: pki:test:sign
+        vars: {ROLE: helloworld-example-com}
 
   pki:read:
     desc: Read pki-int configuration (urls, crl, cluster, issuers, roles)
