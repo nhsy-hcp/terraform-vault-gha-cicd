@@ -1,3 +1,5 @@
 allowed_domains:
   - helloworld.example.com
+  - helloworld2.example.com
+  - helloworld3.example.com
 allow_bare_domains: true
